@@ -1,53 +1,39 @@
-import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, NavLink } from 'react-router-dom';
+import Actives from './Actives';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+export const App = () => {
 
-  useEffect(() => {
-    const script = document.createElement('script')
-    script.src = "https://telegram.org/js/telegram-widget.js?22"
-    script.async = true
-    script.setAttribute('data-telegram-login', 'demo_test_1212_bot')
-    script.setAttribute('data-size', 'small')
-    script.setAttribute('data-userpic', 'false')
-    script.setAttribute('data-radius', '10')
-    script.setAttribute('data-onauth', 'onTelegramAuth(user)')
-    script.setAttribute('data-request-access', 'write')
-    document.getElementById('telegram-login').appendChild(script)
-  }, [])
+    return (
+      <Router>
+      <div className="container">
+        <header className="header">
+          <h1>Общий баланс</h1>
+          <h2>0,00$</h2>
+          <div className="buttons">
+            <button>Пополнить</button>
+            <button>Вывести</button>
+            <button>Обменять</button>
+          </div>
+        </header>
 
-  window.onTelegramAuth = function(user) {
-    alert('Logged in as ' + user.first_name + ' ' + user.last_name + ' (' + user.id + (user.username ? ', @' + user.username : '') + ')')
-  }
+        <Routes>
+            <Route path="/actives" element={<Actives />} />
+            {/* <Route path="/trade" element={<Trade />} /> */}
+            <Route path="/" element={<Actives />} />
+          </Routes>
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <footer className="footer">
+          <div><NavLink to="/actives" className={({ isActive }) => isActive ? 'active-link' : ''}>Активы</NavLink></div>
+          <div><NavLink to="/trade" className={({ isActive }) => isActive ? 'active-link' : ''}>Торговля</NavLink></div>
+        </footer>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-      <div id="telegram-login"></div>
-    </>
-  )
+      
+      </Router>
+    );
 }
 
-export default App
+export default App;
+
+
