@@ -1,7 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, NavLink } from 'react-router-dom';
 import Actives from './Actives';
+import Trade from './Trade';
 import './App.css';
+import CandlestickChart from './TickerTrade';
+
 
 export const App = () => {
 
@@ -20,13 +23,15 @@ export const App = () => {
 
         <Routes>
             <Route path="/actives" element={<Actives />} />
-            {/* <Route path="/trade" element={<Trade />} /> */}
+            <Route path="/trade" element={<Trade />} />
             <Route path="/" element={<Actives />} />
+            <Route path="/trade/:ticker" element={<CandlestickChart />} />
           </Routes>
 
         <footer className="footer">
           <div><NavLink to="/actives" className={({ isActive }) => isActive ? 'active-link' : ''}>Активы</NavLink></div>
           <div><NavLink to="/trade" className={({ isActive }) => isActive ? 'active-link' : ''}>Торговля</NavLink></div>
+          
         </footer>
       </div>
       
