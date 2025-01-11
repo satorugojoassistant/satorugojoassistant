@@ -1,19 +1,16 @@
-import React from 'react';
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from './supabase';
 import { NavLink } from 'react-router-dom';
-import TokenCard from './components/TockenCard';
+import TokenCard from './components/TokenCard';
+
 const binance = 'https://api.binance.com/api/v3/ticker/24hr?symbol=';
+
 const Trade = () => {
-
-
     const [tokens, setTokens] = useState([]);
 
     useEffect(() => {
         const fetchTokens = async () => {
-            const { data, error } = await supabase
-                .from('tokens')
-                .select('*');
+            const { data, error } = await supabase.from('tokens').select('*');
             if (error) {
                 console.error('Error fetching tokens:', error);
             } else {
@@ -25,37 +22,31 @@ const Trade = () => {
     }, []);
 
     useEffect(() => {
-        let a = 0
         const fetchCryptoPrices = async () => {
-            if(!tokens.length) return;
-            if (!tokens[0]?.price) {
-                const responses = await Promise.all(
-                    tokens.map((item) => fetch(binance + item.ticker.toUpperCase() + 'USDT'))
-                );
-                const data = await Promise.all(responses.map((res) => res.json()));
-                a = 1
-                setTokens((prevCrypto) =>
-                    prevCrypto.map((item, index) => ({
-                        ...item,
-                        price: item.ticker !== 'USDT' ? Number(data[index].lastPrice).toFixed(2) : item.price,
-                        priceChangePercent: item.ticker !== 'USDT' ? Number(data[index].priceChangePercent).toFixed(2) : item.priceChangePercent,
-                    }))
-                );
+            if (!tokens.length || tokens[0]?.price) return;
 
-              
+            const responses = await Promise.all(
+                tokens.map((item) => fetch(binance + item.ticker.toUpperCase() + 'USDT'))
+            );
+            const data = await Promise.all(responses.map((res) => res.json()));
 
-            }
-            
+            setTokens((prevTokens) =>
+                prevTokens.map((item, index) => ({
+                    ...item,
+                    price: item.ticker !== 'USDT' ? Number(data[index].lastPrice).toFixed(2) : item.price,
+                    priceChangePercent: item.ticker !== 'USDT' ? Number(data[index].priceChangePercent).toFixed(2) : item.priceChangePercent,
+                }))
+            );
         };
 
-        setTimeout(() => {
-            fetchCryptoPrices();
-        }, 1000);
+        const timer = setTimeout(fetchCryptoPrices, 1000);
+        return () => clearTimeout(timer);
     }, [tokens]);
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {tokens.map((token) => (
-                <NavLink to={`/trade/${token.ticker}`} style={{ textDecoration: 'none', color: 'black' }}>
+                <NavLink key={token.ticker} to={`/trade/${token.ticker}`} style={{ textDecoration: 'none', color: 'black' }}>
                     <TokenCard token={token} />
                 </NavLink>
             ))}
@@ -64,4 +55,3 @@ const Trade = () => {
 };
 
 export default Trade;
-

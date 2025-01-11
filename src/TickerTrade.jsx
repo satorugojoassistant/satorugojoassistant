@@ -1,17 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useParams } from 'react-router-dom';
 import TockenCard from './components/TockenCard';
 import Chart from 'react-apexcharts';
 import { supabase } from './supabase';
 
 const binance = 'https://api.binance.com/api/v3/ticker/24hr?symbol=';
+const killedPriceTime = 1000;
 
 const CandlestickChart = () => {
   const [series, setSeries] = useState([]);
   const [time, setTime] = useState('1m');
   const [currentTicker, setCurrentTicker] = useState({});
   const [currentTickerMath, setCurrentTickerMath] = useState({ price: 0, priceChangePercent: 0 });
-  const [isKilled, setIsKilled] = useState(false);
+  const startKilled = useRef();
+  const stopKilled = useRef();
+  const sellPrice = useRef(0);
   const { ticker } = useParams();
 
   useEffect(() => {
@@ -30,13 +33,15 @@ const CandlestickChart = () => {
     };
 
     fetchTicker();
-  }, []);
+  }, [ticker]);
 
   useEffect(() => {
     const fetchData = async () => {
       const data = await fetchCandlestickData(ticker, time);
+      if (Date.now() < stopKilled.current) {
+        data[data.length - 1].y[3] = sellPrice.current;
+      }
       setSeries([{ data }]);
-      console.log(data)
     };
 
     const interval = setInterval(fetchData, 1000);
@@ -77,52 +82,67 @@ const CandlestickChart = () => {
   };
 
   const handleBuyClick = () => {
-    isKilled(true)
-  }
+    sellPrice.current = currentTickerMath.price * 1.05;
+    startKilled.current = Date.now();
+    stopKilled.current = Date.now() + killedPriceTime;
+  };
 
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', backgroundColor: '#f9f9f9' }}>
-      {(currentTickerMath.price && currentTicker.ticker) && <NavLink to="/trade"><TockenCard token={{ ...currentTicker, ...currentTickerMath }} /></NavLink>}
+      {currentTickerMath.price && currentTicker.ticker && (
+        <NavLink to="/trade">
+          <TockenCard token={{ ...currentTicker, ...currentTickerMath }} />
+        </NavLink>
+      )}
       <Chart options={options} series={series} type="candlestick" height={350} />
       <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-around' }}>
-        {['1m', '5m', '30m', '1h', '1d'].map(interval => (
+        {['1m', '5m', '30m', '1h', '1d'].map((interval) => (
           <button
             key={interval}
             onClick={() => handleIntervalChange(interval)}
-            style={{ 
-              padding: '10px 20px', 
-              cursor: 'pointer', 
-              background: 'linear-gradient(90deg, #1e3c72, #2a5298)', 
-              color: '#fff', 
-              border: '1px solid #1e3c72', 
+            style={{
+              padding: '10px 20px',
+              cursor: 'pointer',
+              background: 'linear-gradient(90deg, #1e3c72, #2a5298)',
+              color: '#fff',
+              border: '1px solid #1e3c72',
               borderRadius: '5px',
-              transition: 'background 0.3s ease'
+              transition: 'background 0.3s ease',
             }}
           >
             {interval.toUpperCase()}
           </button>
         ))}
       </div>
-   
+
       <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '20px' }}>
-        <button onClick={handleBuyClick} style={{ 
-          padding: '10px 20px', 
-          cursor: 'pointer', 
-          background: 'linear-gradient(90deg, #28a745, #218838)', 
-          color: '#fff', 
-          border: '1px solid #28a745', 
-          borderRadius: '5px',
-          transition: 'background 0.3s ease'
-        }}>Купить</button>
-        <button style={{ 
-          padding: '10px 20px', 
-          cursor: 'pointer', 
-          background: 'linear-gradient(90deg, #dc3545, #c82333)', 
-          color: '#fff', 
-          border: '1px solid #dc3545', 
-          borderRadius: '5px',
-          transition: 'background 0.3s ease'
-        }}>Продать</button>
+        <button
+          onClick={handleBuyClick}
+          style={{
+            padding: '10px 20px',
+            cursor: 'pointer',
+            background: 'linear-gradient(90deg, #28a745, #218838)',
+            color: '#fff',
+            border: '1px solid #28a745',
+            borderRadius: '5px',
+            transition: 'background 0.3s ease',
+          }}
+        >
+          Купить
+        </button>
+        <button
+          style={{
+            padding: '10px 20px',
+            cursor: 'pointer',
+            background: 'linear-gradient(90deg, #dc3545, #c82333)',
+            color: '#fff',
+            border: '1px solid #dc3545',
+            borderRadius: '5px',
+            transition: 'background 0.3s ease',
+          }}
+        >
+          Продать
+        </button>
       </div>
     </div>
   );
@@ -136,7 +156,7 @@ const fetchCandlestickData = async (ticker, interval = '1m') => {
   );
   const data = await response.json();
 
-  return data.map(d => ({
+  return data.map((d) => ({
     x: new Date(d[0]),
     y: [parseFloat(d[1]), parseFloat(d[2]), parseFloat(d[3]), parseFloat(d[4])],
   }));
