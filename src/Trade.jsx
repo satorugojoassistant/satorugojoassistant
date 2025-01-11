@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from './supabase';
 import { NavLink } from 'react-router-dom';
-import TokenCard from './components/TokenCard';
+import TokenCard from './components/TockenCard';
 
 const binance = 'https://api.binance.com/api/v3/ticker/24hr?symbol=';
 

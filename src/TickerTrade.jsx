@@ -11,7 +11,7 @@ const CandlestickChart = () => {
   const [series, setSeries] = useState([]);
   const [time, setTime] = useState('1m');
   const [currentTicker, setCurrentTicker] = useState({});
-  const [currentTickerMath, setCurrentTickerMath] = useState({ price: 0, priceChangePercent: 0 });
+  const [currentTickerMath, setCurrentTickerMath] = useState({ price: null, priceChangePercent: 0 });
   const startKilled = useRef();
   const stopKilled = useRef();
   const sellPrice = useRef(0);
@@ -36,31 +36,41 @@ const CandlestickChart = () => {
   }, [ticker]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await fetchCandlestickData(ticker, time);
-      if (Date.now() < stopKilled.current) {
-        data[data.length - 1].y[3] = sellPrice.current;
+    const fetchDataAndPrices = async () => {
+      const candlestickData = await fetchCandlestickData(ticker, time);
+      const response = await fetch(`${binance}${ticker.toUpperCase()}USDT`);
+      const priceData = await response.json();
+
+      if (stopKilled.current) {
+      if (Date.now() > stopKilled.current) {
+        candlestickData[candlestickData.length - 1].y[3] = sellPrice.current;
+        console.log(sellPrice.current);
+        stopKilled.current = null;
+        setCurrentTickerMath(prev => ({
+          price: sellPrice.current,
+          priceChangePercent: (((sellPrice.current - prev.prevClosePrice) / prev.prevClosePrice) * 100).toFixed(2),
+        }));
       }
-      setSeries([{ data }]);
+      
+      } else {
+      setCurrentTickerMath({
+        price: priceData.lastPrice,
+        priceChangePercent: priceData.priceChangePercent,
+        prevClosePrice: priceData.prevClosePrice,
+      });
+      }
+
+      setSeries([{ data: candlestickData }]);
     };
 
-    const interval = setInterval(fetchData, 1000);
+    const interval = setInterval(() => {
+      fetchDataAndPrices()
+    }, 5000);
+
+    fetchDataAndPrices()
+
     return () => clearInterval(interval);
   }, [time, ticker]);
-
-  useEffect(() => {
-    const fetchCryptoPrices = async () => {
-      const response = await fetch(`${binance}${ticker.toUpperCase()}USDT`);
-      const data = await response.json();
-      setCurrentTickerMath({
-        price: Number(data.lastPrice).toFixed(2),
-        priceChangePercent: Number(data.priceChangePercent).toFixed(2),
-      });
-    };
-
-    const interval = setInterval(fetchCryptoPrices, 1000);
-    return () => clearInterval(interval);
-  }, [ticker]);
 
   const options = {
     chart: {
@@ -75,6 +85,23 @@ const CandlestickChart = () => {
     xaxis: {
       type: 'datetime',
     },
+    yaxis: {
+      labels: {
+        formatter: function (value) {
+          return value.toFixed(2);
+        },
+      },
+    },
+    theme: {
+      mode: 'light',
+      palette: 'palette1',
+      monochrome: {
+        enabled: true,
+        color: '#ffffff',
+        shadeTo: 'light',
+        shadeIntensity: 0.65,
+      },
+    },
   };
 
   const handleIntervalChange = (event) => {
@@ -82,19 +109,19 @@ const CandlestickChart = () => {
   };
 
   const handleBuyClick = () => {
-    sellPrice.current = currentTickerMath.price * 1.05;
+    sellPrice.current = currentTickerMath.price * 1.005;
     startKilled.current = Date.now();
     stopKilled.current = Date.now() + killedPriceTime;
   };
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', backgroundColor: '#f9f9f9' }}>
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', backgroundColor: '#020230', color: 'white'}}>
+      <Chart options={options} series={series} type="candlestick" height={350} />
       {currentTickerMath.price && currentTicker.ticker && (
         <NavLink to="/trade">
           <TockenCard token={{ ...currentTicker, ...currentTickerMath }} />
         </NavLink>
       )}
-      <Chart options={options} series={series} type="candlestick" height={350} />
       <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-around' }}>
         {['1m', '5m', '30m', '1h', '1d'].map((interval) => (
           <button
@@ -130,6 +157,18 @@ const CandlestickChart = () => {
         >
           Купить
         </button>
+        <input
+          type="number"
+          placeholder="Enter amount"
+          style={{
+            background: 'linear-gradient(90deg, #1e3c72, #2a5298)',
+            padding: '10px',
+            color: 'white',
+            borderRadius: '5px',
+            border: '1px solid #ccc',
+            width: '100px',
+          }}
+        />
         <button
           style={{
             padding: '10px 20px',

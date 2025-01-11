@@ -7,7 +7,17 @@ const initialCrypto = [
     { ticker: 'ETH', name: 'Ethereum', price: 0, img: '/eth.png', amount: 0, convertToUsd: '0,00$' },
     { ticker: 'USDT', name: 'Tether', price: 1.00, img: '/usdt.png', amount: 0, convertToUsd: '0,00$' },
 ];
-
+const Header = () => (
+    <header className="header">
+      <h1>Общий баланс</h1>
+      <h2>0,00$</h2>
+      <div className="buttons">
+        <button>Пополнить</button>
+        <button>Вывести</button>
+        <button>Обменять</button>
+      </div>
+    </header>
+  );
 const Actives = () => {
     const [crypto, setCrypto] = useState(initialCrypto);
     const [rub, setRub] = useState(0);
@@ -26,9 +36,12 @@ const Actives = () => {
                 }))
             );
         };
-
+        const interva = setInterval(fetchCryptoPrices, 5000);
         fetchCryptoPrices();
-    }, [crypto]);
+
+        return () => clearInterval(interva);
+
+    }, []);
 
     useEffect(() => {
         const fetchRubPrice = async () => {
@@ -63,7 +76,7 @@ const Actives = () => {
                         <img src={item.img} alt={item.name} width={30} height={30} style={{ borderRadius: '50%' }} />
                         <div>
                             <p style={{ margin: '5px 0' }}>{item.name}</p>
-                            <p style={{ margin: '5px 0' }} className='crypto-list-price'>{item.price} $</p>
+                            <p style={{ margin: '5px 0', color: '#fff' }} className='crypto-list-price'>{item.price} $</p>
                         </div>
                     </div>
                     <div>
@@ -100,7 +113,8 @@ const Actives = () => {
 
     return (
         <div>
-            <section className="section">
+            <Header />
+            <section className="section" style={{border: 0}}>
                 <h2>Профиль</h2>
                 <p>ID аккаунта: <strong>676132075</strong></p>
                 <p>Статистика: <strong>0 / <span className='win'>0</span> / <span className='loss'>0</span></strong></p>
@@ -117,6 +131,9 @@ const Actives = () => {
                 <h2>Криптовалюты</h2>
                 {renderCryptoList()}
                 {renderSettingsButton()}
+            </section>
+            <section className='section' style={{border: 0}}>
+
             </section>
         </div>
     );

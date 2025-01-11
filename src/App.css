@@ -1,8 +1,8 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background-color: #f8f8f8;
-  color: #333;
+  background-color: #020230;
+  color: #fff ;
 }
 
 .container {
@@ -42,7 +42,8 @@ body {
 }
 
 .section {
-  background-color: #fff;
+  background-color:#020230;
+  border: 1px solid #007bff;
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 10px;
@@ -68,7 +69,7 @@ body {
 }
 .crypto-list-price {
   font-size: 1rem;
-  color: gray;
+  color: white;
   margin: 0;
 }
 .win {
@@ -80,9 +81,10 @@ body {
 .currency-list li, .crypto-list li {
   display: flex;
   justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
-}
+  margin: 10px 0;
+  padding: 20px 10px;
+  border-radius: 15px;
+ }
 
 .currency-list li:last-child, .crypto-list li:last-child {
   border-bottom: none;
@@ -92,9 +94,9 @@ body {
   display: flex;
   justify-content: space-around;
   padding: 10px 0;
-  border-top: 1px solid #ddd;
+  border-top: 1px solid black;
   margin-top: 20px;
-  background-color: #fff;
+  background-color: #020230;
   position: fixed;
   width: 100%;
   bottom: 0;
