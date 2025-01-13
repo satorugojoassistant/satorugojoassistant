@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { NavLink, useParams } from 'react-router-dom';
+import { Form, NavLink, useParams } from 'react-router-dom';
 import TockenCard from './components/TockenCard';
 import Chart from 'react-apexcharts';
 import { supabase } from './supabase';
-import { Drawer, TextField, InputAdornment } from '@mui/material';
+import { Drawer, TextField, InputAdornment, FormControl, Select, MenuItem, InputLabel} from '@mui/material';
 import { inputBaseClasses } from '@mui/material/InputBase';
 
 const buy = {
@@ -43,6 +43,20 @@ const CandlestickChart = () => {
   const stopKilled = useRef();
   const sellPrice = useRef(0);
   const { ticker } = useParams();
+  const [trades, setTrades] = useState([]);
+
+  useEffect(() => {
+    const fetchTrades = async () => {
+      const { data, error } = await supabase.from('trades').select('*');
+      if (error) {
+        console.error('Error fetching trades:', error);
+      } else {
+        setTrades(data);
+      }
+    }
+    const interval = setInterval(fetchTrades, 100000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const fetchTicker = async () => {
@@ -201,18 +215,41 @@ const CandlestickChart = () => {
         </button>
       </div>
 
-      <Drawer anchor="bottom" open={drawerOpen} onClose={toggleDrawer(false)} style={{width: '100%', boxSizing: 'border-box'}}>
+      <Drawer anchor="bottom" open={drawerOpen} onClose={toggleDrawer(false)} style={{width: '100%', boxSizing: 'border-box',  }}>
         <div
           role="presentation"
-          style={{ width: '100%', boxSizing:'border-box', height: '400px', borderStartStartRadius: '10px', borderStartEndRadius: '10px', flexWrap: 'wrap' }}
+          style={{ width: '100%', boxSizing:'border-box', height: '400px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', backgroundColor: '#12192C', color: 'white', paddingBottom: '10px'}}
         >
+         
           <div style={{padding: '10px'}}>
-          <h2>Bы покупаете {ticker}</h2>
+          <h2>Bы покупаете <span style={{color: '#0056b3', fontWeight: 600}}>{ticker}</span></h2>
           <TextField
             id="outlined-suffix-shrink"
             label="Количество"
             variant="outlined"
             type="number"
+            color="primary"
+            sx={{
+              maxWidth: '200px',
+              '& .MuiInputBase-root': {
+                color: 'white',
+              },
+              '& .MuiInputLabel-root': {
+                color: 'white',
+              },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: 'white',
+                },
+                '&:hover fieldset': {
+                  borderColor: 'white',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: 'white',
+                },
+              },
+            }}
+            required
             slotProps={{
               input: {
                 endAdornment: (
@@ -233,31 +270,46 @@ const CandlestickChart = () => {
             }}
           />
           <p>Доступно: 0 USDT</p>
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <FormControl sx={{minWidth: 120}} required>
+          <InputLabel id="demo-simple-select-label" style={{ color: 'white' }}>Длительность трейда</InputLabel>         
+          <Select  
+          label="Длительность трейда"
+          labelId="demo-simple-select-label"
+          id="demo-simple-select"
+          sx={{
+            color: 'white',
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'white',
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'white',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'white',
+            },
+            '& .MuiSvgIcon-root': {
+              color: 'white',
+            },
+          }}>
             {['30s', '1m', '5m', '15m', '30m', '1h'].map((time) => (
-              <button
+              <MenuItem
                 key={time}
-                style={{
-                  padding: '10px 20px',
-                  cursor: 'pointer',
-                  background: timeToFinish === time ? 'linear-gradient(90deg, #1e3c72, #2a5298)' : '#fff',
-                  color: timeToFinish === time ? '#fff' : '#000',
-                  border: '1px solid #1e3c72',
-                  borderRadius: '5px',
-                  transition: 'background 0.3s ease',
-                }}
+                value={time}
                 onClick={() => handeTimeChange(time)}
               >
                 {time}
-              </button>
+              </MenuItem>
             ))}
-          </div>
+          </Select>
+          </FormControl>
+
           </div>
 
 
           <button style={{...(trade === 'buy' ? buy : sell), marginTop: '5px', width: '100vw'}}>
             {trade === 'buy' ? 'Купить': 'Продать'}
           </button>
+
         </div>
       </Drawer>
     </div>
