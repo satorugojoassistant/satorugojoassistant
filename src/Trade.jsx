@@ -44,12 +44,15 @@ const Trade = () => {
     }, [tokens]);
 
     return (
+        <div>
+        <h2 style={{color: '#4A90E2', fontSize: '1.5rem', padding: '0px 16px'}}>Торговая пара</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {tokens.map((token) => (
                 <NavLink key={token.ticker} to={`/trade/${token.ticker}`} style={{ textDecoration: 'none', color: 'black' }}>
                     <TokenCard token={token} />
                 </NavLink>
             ))}
+        </div>
         </div>
     );
 };

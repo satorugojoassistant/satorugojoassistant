@@ -12,9 +12,19 @@ const Header = () => (
       <h1>Общий баланс</h1>
       <h2>0,00$</h2>
       <div className="buttons">
-        <button>Пополнить</button>
-        <button>Вывести</button>
-        <button>Обменять</button>
+        <div>
+        <img src="/top.svg" width={30} height={30}/>
+        <span>Пополнить</span>
+        </div>
+        <div>
+        <img src="/bottom.svg" width={30} height={30}/>
+        <span>Вывести</span>
+        </div>
+        <div>
+        <img src="/swap.svg" width={30} height={30}/>
+
+        <span>Обменять</span>
+        </div>
       </div>
     </header>
   );
@@ -63,7 +73,7 @@ const Actives = () => {
                         <p style={{ margin: '5px 0' }} className='crypto-list-price'>{rub} ₽</p>
                     </div>
                 </div>
-                {rub} ₽
+                {0} ₽
             </li>
         </ul>
     );
@@ -116,9 +126,12 @@ const Actives = () => {
             <Header />
             <section className="section" style={{border: 0}}>
                 <h2>Профиль</h2>
-                <p>ID аккаунта: <strong>676132075</strong></p>
-                <p>Статистика: <strong>0 / <span className='win'>0</span> / <span className='loss'>0</span></strong></p>
-                <p>Объем торгов: <strong>0,00 USDT</strong></p>
+                <strong>676132075</strong>
+                <p>ID аккаунта </p>
+                <strong>0 / <span className='win'>0</span> / <span className='loss'>0</span></strong>
+                <p>Статистика</p>
+                <strong>0,00 USDT</strong>
+                <p>Объем торгов</p>
             </section>
 
             <section className="section">

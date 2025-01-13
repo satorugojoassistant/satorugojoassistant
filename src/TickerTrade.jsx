@@ -3,6 +3,8 @@ import { NavLink, useParams } from 'react-router-dom';
 import TockenCard from './components/TockenCard';
 import Chart from 'react-apexcharts';
 import { supabase } from './supabase';
+import { Drawer } from '@mui/material';
+
 
 const binance = 'https://api.binance.com/api/v3/ticker/24hr?symbol=';
 const killedPriceTime = 1000;
@@ -12,6 +14,7 @@ const CandlestickChart = () => {
   const [time, setTime] = useState('1m');
   const [currentTicker, setCurrentTicker] = useState({});
   const [currentTickerMath, setCurrentTickerMath] = useState({ price: null, priceChangePercent: 0 });
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const startKilled = useRef();
   const stopKilled = useRef();
   const sellPrice = useRef(0);
@@ -42,22 +45,21 @@ const CandlestickChart = () => {
       const priceData = await response.json();
 
       if (stopKilled.current) {
-      if (Date.now() > stopKilled.current) {
-        candlestickData[candlestickData.length - 1].y[3] = sellPrice.current;
-        console.log(sellPrice.current);
-        stopKilled.current = null;
-        setCurrentTickerMath(prev => ({
-          price: sellPrice.current,
-          priceChangePercent: (((sellPrice.current - prev.prevClosePrice) / prev.prevClosePrice) * 100).toFixed(2),
-        }));
-      }
-      
+        if (Date.now() > stopKilled.current) {
+          candlestickData[candlestickData.length - 1].y[3] = sellPrice.current;
+          console.log(sellPrice.current);
+          stopKilled.current = null;
+          setCurrentTickerMath(prev => ({
+            price: sellPrice.current,
+            priceChangePercent: (((sellPrice.current - prev.prevClosePrice) / prev.prevClosePrice) * 100).toFixed(2),
+          }));
+        }
       } else {
-      setCurrentTickerMath({
-        price: priceData.lastPrice,
-        priceChangePercent: priceData.priceChangePercent,
-        prevClosePrice: priceData.prevClosePrice,
-      });
+        setCurrentTickerMath({
+          price: priceData.lastPrice,
+          priceChangePercent: priceData.priceChangePercent,
+          prevClosePrice: priceData.prevClosePrice,
+        });
       }
 
       setSeries([{ data: candlestickData }]);
@@ -108,10 +110,22 @@ const CandlestickChart = () => {
     setTime(event);
   };
 
-  const handleBuyClick = () => {
-    sellPrice.current = currentTickerMath.price * 1.005;
+  const handleBuyClick = (trade) => {
+    setDrawerOpen(true);
+    if (trade === 'buy') {
+      sellPrice.current = currentTickerMath.price * 1.005;
+    } else {
+      sellPrice.current = currentTickerMath.price * 0.995;
+    }
     startKilled.current = Date.now();
     stopKilled.current = Date.now() + killedPriceTime;
+  };
+
+  const toggleDrawer = (open) => (event) => {
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+      return;
+    }
+    setDrawerOpen(open);
   };
 
   return (
@@ -142,11 +156,12 @@ const CandlestickChart = () => {
         ))}
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '20px', gap: '10px' }}>
         <button
-          onClick={handleBuyClick}
+          onClick={() => handleBuyClick('buy')}
           style={{
             padding: '10px 20px',
+            width: '100%',
             cursor: 'pointer',
             background: 'linear-gradient(90deg, #28a745, #218838)',
             color: '#fff',
@@ -157,21 +172,11 @@ const CandlestickChart = () => {
         >
           Купить
         </button>
-        <input
-          type="number"
-          placeholder="Enter amount"
-          style={{
-            background: 'linear-gradient(90deg, #1e3c72, #2a5298)',
-            padding: '10px',
-            color: 'white',
-            borderRadius: '5px',
-            border: '1px solid #ccc',
-            width: '100px',
-          }}
-        />
         <button
+          onClick={() => handleBuyClick('sell')}
           style={{
             padding: '10px 20px',
+            width: '100%',
             cursor: 'pointer',
             background: 'linear-gradient(90deg, #dc3545, #c82333)',
             color: '#fff',
@@ -183,6 +188,20 @@ const CandlestickChart = () => {
           Продать
         </button>
       </div>
+
+      <Drawer anchor="bottom" open={drawerOpen} onClose={toggleDrawer(false)}>
+        <div
+          role="presentation"
+          onClick={toggleDrawer(false)}
+          onKeyDown={toggleDrawer(false)}
+          style={{ width: 250, padding: '20px' }}
+        >
+          <h2>Trade Details</h2>
+          <p>Price: {currentTickerMath.price}</p>
+          <p>Price Change Percent: {currentTickerMath.priceChangePercent}%</p>
+          {/* Add more trade details here */}
+        </div>
+      </Drawer>
     </div>
   );
 };
