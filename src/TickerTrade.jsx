@@ -3,8 +3,30 @@ import { NavLink, useParams } from 'react-router-dom';
 import TockenCard from './components/TockenCard';
 import Chart from 'react-apexcharts';
 import { supabase } from './supabase';
-import { Drawer } from '@mui/material';
+import { Drawer, TextField, InputAdornment } from '@mui/material';
+import { inputBaseClasses } from '@mui/material/InputBase';
 
+const buy = {
+  padding: '10px 20px',
+  width: '100%',
+  cursor: 'pointer',
+  background: 'linear-gradient(90deg, #28a745, #218838)',
+  color: '#fff',
+  border: '1px solid #28a745',
+  borderRadius: '5px',
+  transition: 'background 0.3s ease',
+}
+
+const sell = {
+  padding: '10px 20px',
+  width: '100%',
+  cursor: 'pointer',
+  background: 'linear-gradient(90deg, #dc3545, #c82333)',
+  color: '#fff',
+  border: '1px solid #dc3545',
+  borderRadius: '5px',
+  transition: 'background 0.3s ease',
+}
 
 const binance = 'https://api.binance.com/api/v3/ticker/24hr?symbol=';
 const killedPriceTime = 1000;
@@ -12,7 +34,9 @@ const killedPriceTime = 1000;
 const CandlestickChart = () => {
   const [series, setSeries] = useState([]);
   const [time, setTime] = useState('1m');
+  const [timeToFinish, setTimeToFinish] = useState(0);
   const [currentTicker, setCurrentTicker] = useState({});
+  const [trade,setTrade] = useState();
   const [currentTickerMath, setCurrentTickerMath] = useState({ price: null, priceChangePercent: 0 });
   const [drawerOpen, setDrawerOpen] = useState(false);
   const startKilled = useRef();
@@ -112,6 +136,8 @@ const CandlestickChart = () => {
 
   const handleBuyClick = (trade) => {
     setDrawerOpen(true);
+    setTrade(trade);
+    
     if (trade === 'buy') {
       sellPrice.current = currentTickerMath.price * 1.005;
     } else {
@@ -128,15 +154,19 @@ const CandlestickChart = () => {
     setDrawerOpen(open);
   };
 
+  const handeTimeChange = (time) => {
+    setTimeToFinish(time);
+  }
+
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', backgroundColor: '#020230', color: 'white'}}>
-      <Chart options={options} series={series} type="candlestick" height={350} />
+    <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#020230', color: 'white', width: '100%', height:'100%', boxSizing:'border-box', padding:'10px' }}>
+      <Chart options={options} series={series} type="candlestick" height={350} width={'100%'}/>
       {currentTickerMath.price && currentTicker.ticker && (
         <NavLink to="/trade">
           <TockenCard token={{ ...currentTicker, ...currentTickerMath }} />
         </NavLink>
       )}
-      <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-around' }}>
+      <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap' }}>
         {['1m', '5m', '30m', '1h', '1d'].map((interval) => (
           <button
             key={interval}
@@ -144,8 +174,8 @@ const CandlestickChart = () => {
             style={{
               padding: '10px 20px',
               cursor: 'pointer',
-              background: 'linear-gradient(90deg, #1e3c72, #2a5298)',
-              color: '#fff',
+              background: time === interval ? 'linear-gradient(90deg, #1e3c72, #2a5298)' : '#fff',
+              color: time === interval ? '#fff' : '#000',
               border: '1px solid #1e3c72',
               borderRadius: '5px',
               transition: 'background 0.3s ease',
@@ -159,47 +189,75 @@ const CandlestickChart = () => {
       <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '20px', gap: '10px' }}>
         <button
           onClick={() => handleBuyClick('buy')}
-          style={{
-            padding: '10px 20px',
-            width: '100%',
-            cursor: 'pointer',
-            background: 'linear-gradient(90deg, #28a745, #218838)',
-            color: '#fff',
-            border: '1px solid #28a745',
-            borderRadius: '5px',
-            transition: 'background 0.3s ease',
-          }}
+          style={buy}
         >
           Купить
         </button>
         <button
           onClick={() => handleBuyClick('sell')}
-          style={{
-            padding: '10px 20px',
-            width: '100%',
-            cursor: 'pointer',
-            background: 'linear-gradient(90deg, #dc3545, #c82333)',
-            color: '#fff',
-            border: '1px solid #dc3545',
-            borderRadius: '5px',
-            transition: 'background 0.3s ease',
-          }}
+          style={sell}
         >
           Продать
         </button>
       </div>
 
-      <Drawer anchor="bottom" open={drawerOpen} onClose={toggleDrawer(false)}>
+      <Drawer anchor="bottom" open={drawerOpen} onClose={toggleDrawer(false)} style={{width: '100%', boxSizing: 'border-box'}}>
         <div
           role="presentation"
-          onClick={toggleDrawer(false)}
-          onKeyDown={toggleDrawer(false)}
-          style={{ width: 250, padding: '20px' }}
+          style={{ width: '100%', boxSizing:'border-box', height: '400px', borderStartStartRadius: '10px', borderStartEndRadius: '10px', flexWrap: 'wrap' }}
         >
-          <h2>Trade Details</h2>
-          <p>Price: {currentTickerMath.price}</p>
-          <p>Price Change Percent: {currentTickerMath.priceChangePercent}%</p>
-          {/* Add more trade details here */}
+          <div style={{padding: '10px'}}>
+          <h2>Bы покупаете {ticker}</h2>
+          <TextField
+            id="outlined-suffix-shrink"
+            label="Количество"
+            variant="outlined"
+            type="number"
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment
+                    position="end"
+                    sx={{
+                      opacity: 0,
+                      pointerEvents: 'none',
+                      [`[data-shrink=true] ~ .${inputBaseClasses.root} > &`]: {
+                        opacity: 1,
+                      },
+                    }}
+                  >
+                    <p style={{color: '#B0B8C1'}}>USDT</p>
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+          <p>Доступно: 0 USDT</p>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            {['30s', '1m', '5m', '15m', '30m', '1h'].map((time) => (
+              <button
+                key={time}
+                style={{
+                  padding: '10px 20px',
+                  cursor: 'pointer',
+                  background: timeToFinish === time ? 'linear-gradient(90deg, #1e3c72, #2a5298)' : '#fff',
+                  color: timeToFinish === time ? '#fff' : '#000',
+                  border: '1px solid #1e3c72',
+                  borderRadius: '5px',
+                  transition: 'background 0.3s ease',
+                }}
+                onClick={() => handeTimeChange(time)}
+              >
+                {time}
+              </button>
+            ))}
+          </div>
+          </div>
+
+
+          <button style={{...(trade === 'buy' ? buy : sell), marginTop: '5px', width: '100vw'}}>
+            {trade === 'buy' ? 'Купить': 'Продать'}
+          </button>
         </div>
       </Drawer>
     </div>

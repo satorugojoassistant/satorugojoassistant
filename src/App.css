@@ -3,33 +3,51 @@
 @import '@fontsource/arimo/700.css';
 @import '@fontsource/arimo/600.css';
 
+/* Define CSS variables */
+:root {
+  --background-color: black;
+  --text-color: #fff;
+  --header-background-color: #12192C;
+  --header-text-color: #B0B8C1;
+  --header-img-background-color: #4A90E2;
+  --section-background-color: #12192C;
+  --section-text-color: #B0B8C1;
+  --section-heading-color: #0056b3;
+  --crypto-list-price-color: white;
+  --win-color: green;
+  --loss-color: red;
+  --footer-background-color: #12192C;
+  --footer-text-color: #B0B8C1;
+  --active-link-color: #4A90E2;
+  --footer-hover-color: #007bff;
+}
+
 body {
   margin: 0;
   font-family: 'Arimo', sans-serif;
-  background-color: black;
-  color: #fff ;
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 .container {
   margin: 0 auto;
   height: 100vh;
-
 }
 
 .header {
   text-align: center;
   margin-bottom: 5px;
-  background-color: #12192C;
+  background-color: var(--header-background-color);
   padding: 20px;
 }
 
 .header h2 {
-  margin: 5px;
-  margin-bottom: 20px;
+  margin: 5px 0 20px;
+  font-size: 1rem;
 }
 
 .header img {
-  background-color: #4A90E2;
+  background-color: var(--header-img-background-color);
   border-radius: 50%;
   padding: 10px;
   width: 20px;
@@ -38,7 +56,7 @@ body {
 
 .header h1 {
   font-size: 1rem;
-  color: #B0B8C1;
+  color: var(--header-text-color);
   margin: 0;
 }
 
@@ -53,26 +71,27 @@ body {
   justify-content: center;
   align-items: center;
   gap: 10px;
-  color: #4A90E2
+  color: var(--header-img-background-color);
+  font-size: 1rem;
 }
 
 .section {
-  background-color: #12192C;
+  background-color: var(--section-background-color);
   padding: 20px;
   margin-bottom: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .section p {
-  color: #B0B8C1;
-  margin-bottom: 10px;
-  margin-top: 4px;
+  color: var(--section-text-color);
+  margin: 4px 0 10px;
+  font-size: 1rem;
 }
 
 .section h2 {
-  margin: 10px 0px;
+  margin: 10px 0;
   font-size: 1rem;
-  color: #0056b3
+  color: var(--section-heading-color);
 }
 
 .currency-list, .crypto-list {
@@ -83,26 +102,33 @@ body {
 
 .crypto-list h1 {
   font-size: 1rem;
-  color: #B0B8C1;
+  color: var(--section-text-color);
   margin: 0;
 }
+
 .crypto-list-price {
   font-size: 1rem;
-  color: white;
+  color: var(--crypto-list-price-color);
   margin: 0;
 }
+
 .win {
-  color: green;
+  color: var(--win-color);
+  font-size: 1rem;
 }
+
 .loss {
-  color: red;
+  color: var(--loss-color);
+  font-size: 1rem;
 }
+
 .currency-list li, .crypto-list li {
   display: flex;
   justify-content: space-between;
   margin: 10px 0;
   border-radius: 15px;
- }
+  font-size: 1rem;
+}
 
 .currency-list li:last-child, .crypto-list li:last-child {
   border-bottom: none;
@@ -113,7 +139,7 @@ body {
   justify-content: space-around;
   padding: 10px 0;
   margin-top: 20px;
-  background-color: #12192C;
+  background-color: var(--footer-background-color);
   position: fixed;
   width: 100%;
   bottom: 0;
@@ -123,28 +149,27 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.footer a {
   text-align: center;
   font-size: 1rem;
   cursor: pointer;
   text-decoration: none;
-  color: #B0B8C1;
+  color: var(--footer-text-color);
 }
+
 .footer svg {
   font-size: 1.5rem;
   width: 20px;
   height: 20px;
 }
+
 .active-link {
-  color: #4A90E2 !important;
+  color: var(--active-link-color) !important;
 }
 
 .active-link svg {
-  color: #4A90E2 !important;
+  color: var(--active-link-color) !important;
 }
 
 .footer div:hover {
-  color: #007bff;
+  color: var(--footer-hover-color);
 }
