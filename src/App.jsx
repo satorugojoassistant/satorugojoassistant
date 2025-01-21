@@ -4,6 +4,7 @@ import Actives from './Actives';
 import Trade from './Trade';
 import './App.css';
 import CandlestickChart from './TickerTrade';
+import { useLocation } from 'react-router-dom';
 
 
 const Footer = () => (
@@ -28,8 +29,13 @@ const Footer = () => (
   </footer>
 );
 
-const App = () => (
-  <Router>
+const App = () => {
+
+    const query = useQuery();
+    const chatId = query.get('chatId');
+    console.log(chatId)
+  return (
+    <Router>
     <div className="container">
       <Routes>
         <Route path="/actives" element={<Actives />} />
@@ -40,6 +46,9 @@ const App = () => (
       <Footer />
     </div>
   </Router>
-);
+  )
+}
+ 
+;
 
 export default App;
