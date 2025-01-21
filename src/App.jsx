@@ -7,8 +7,12 @@ import CandlestickChart from './TickerTrade';
 import { useLocation } from 'react-router-dom';
 
 
-const Footer = () => (
-  <footer className="footer">
+const Footer = () => {
+  const location = useLocation();
+  const chatId = new URLSearchParams(location.search).get('chatId');
+  console.log(chatId)
+  return (
+    <footer className="footer">
       <NavLink to="/actives" className={({ isActive }) => isActive ? 'active-link' : ''}>
 
       <svg width="800px" height="800px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -27,13 +31,13 @@ const Footer = () => (
         <span>Торговля</span>
       </NavLink>
   </footer>
-);
+  )
+}
 
 const App = () => {
 
-    const query = useQuery();
-    const chatId = query.get('chatId');
-    console.log(chatId)
+ 
+
   return (
     <Router>
     <div className="container">
