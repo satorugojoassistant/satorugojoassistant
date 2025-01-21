@@ -307,6 +307,7 @@ const CandlestickChart = () => {
 
 
 
+
           <button style={{...(trade === 'buy' ? buy : sell), marginTop: '5px', width: '100vw'}}>
             {trade === 'buy' ? 'Купить': 'Продать'}
           </button>
