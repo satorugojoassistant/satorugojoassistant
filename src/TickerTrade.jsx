@@ -3,7 +3,7 @@ import { Form, NavLink, useParams } from 'react-router-dom';
 import TockenCard from './components/TockenCard';
 import Chart from 'react-apexcharts';
 import { supabase } from './supabase';
-import { Drawer, TextField, InputAdornment, FormControl, Select, MenuItem, InputLabel} from '@mui/material';
+import { Drawer, TextField, InputAdornment, FormControl, ButtonGroup, MenuItem, InputLabel, Button} from '@mui/material';
 import { inputBaseClasses } from '@mui/material/InputBase';
 
 const buy = {
@@ -34,7 +34,7 @@ const killedPriceTime = 1000;
 const CandlestickChart = () => {
   const [series, setSeries] = useState([]);
   const [time, setTime] = useState('1m');
-  const [timeToFinish, setTimeToFinish] = useState(0);
+  const [timeToFinish, setTimeToFinish] = useState('30s');
   const [currentTicker, setCurrentTicker] = useState({});
   const [trade,setTrade] = useState();
   const [currentTickerMath, setCurrentTickerMath] = useState({ price: null, priceChangePercent: 0 });
@@ -226,7 +226,7 @@ const CandlestickChart = () => {
           <TextField
             id="outlined-suffix-shrink"
             label="Количество"
-            variant="outlined"
+            variant="standard"
             type="number"
             color="primary"
             sx={{
@@ -271,36 +271,20 @@ const CandlestickChart = () => {
           />
           <p>Доступно: 0 USDT</p>
           <FormControl sx={{minWidth: 120}} required>
-          <InputLabel id="demo-simple-select-label" style={{ color: 'white' }}>Длительность трейда</InputLabel>         
-          <Select  
-          label="Длительность трейда"
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          sx={{
-            color: 'white',
-            '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'white',
-            },
-            '&:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'white',
-            },
-            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'white',
-            },
-            '& .MuiSvgIcon-root': {
-              color: 'white',
-            },
-          }}>
+          <ButtonGroup
+          sx={{display: 'flex', justifyContent: 'space-around', gap: '5px', flexWrap: 'wrap'}}
+          labelId="demo-simple-select-label">
             {['30s', '1m', '5m', '15m', '30m', '1h'].map((time) => (
-              <MenuItem
+              <Button
                 key={time}
                 value={time}
                 onClick={() => handeTimeChange(time)}
+                sx={{backgroundColor: timeToFinish === time ? '#1e3c72' : '#fff', color: timeToFinish === time ? '#fff' : '#000', border: '1px solid #1e3c72', borderRadius: '5px', transition: 'background 0.3s ease'}}
               >
                 {time}
-              </MenuItem>
+              </Button>
             ))}
-          </Select>
+          </ButtonGroup>
           </FormControl>
 
           </div>

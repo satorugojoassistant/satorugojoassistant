@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from 'react';
+import { NavLink } from 'react-router-dom';
+import CryptoItem from './CryptoItem';
+import CurrencyItem from './CurrecyItem';
+import { initialCrypto, binance } from './utils';
 
-const binance = 'https://api.binance.com/api/v3/ticker/price?symbol=';
-const initialCrypto = [
-    { ticker: 'BTC', name: 'Bitcoin', price: 0, img: '/btc.png', amount: 0, convertToUsd: '0,00$' },
-    { ticker: 'TON', name: 'Toncoin', price: 0, img: '/ton.png', amount: 0, convertToUsd: '0,00$' },
-    { ticker: 'ETH', name: 'Ethereum', price: 0, img: '/eth.png', amount: 0, convertToUsd: '0,00$' },
-    { ticker: 'USDT', name: 'Tether', price: 1.00, img: '/usdt.png', amount: 0, convertToUsd: '0,00$' },
-];
+
 const Header = () => (
     <header className="header">
       <h1>Общий баланс</h1>
       <h2>0,00$</h2>
       <div className="buttons">
+        <NavLink to="/deposit">
         <div>
         <img src="/top.svg" width={30} height={30}/>
         <span>Пополнить</span>
         </div>
+        </NavLink>
+
         <div>
         <img src="/bottom.svg" width={30} height={30}/>
         <span>Вывести</span>
@@ -28,6 +29,7 @@ const Header = () => (
       </div>
     </header>
   );
+
 const Actives = () => {
     const [crypto, setCrypto] = useState(initialCrypto);
     const [rub, setRub] = useState(0);
@@ -65,35 +67,14 @@ const Actives = () => {
 
     const renderCurrencyList = () => (
         <ul className="currency-list">
-            <li>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <img src={'/rub.jpeg'} alt={'Rub'} width={30} height={30} style={{ borderRadius: '50%' }} />
-                    <div>
-                        <p style={{ margin: '5px 0' }}>Российский рубль</p>
-                        <p style={{ margin: '5px 0' }} className='crypto-list-price'>{rub} ₽</p>
-                    </div>
-                </div>
-                {0} ₽
-            </li>
+            <CurrencyItem rub={rub}/>
         </ul>
     );
 
     const renderCryptoList = () => (
         <ul className="crypto-list">
             {crypto.map((item, index) => (
-                <li key={index} style={{ height: '50px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <img src={item.img} alt={item.name} width={30} height={30} style={{ borderRadius: '50%' }} />
-                        <div>
-                            <p style={{ margin: '5px 0' }}>{item.name}</p>
-                            <p style={{ margin: '5px 0', color: '#fff' }} className='crypto-list-price'>{item.price} $</p>
-                        </div>
-                    </div>
-                    <div>
-                        <p style={{ margin: '5px 0', textAlign: 'end', fontWeight: 700 }}>{item.amount}</p>
-                        <h1 style={{ margin: '5px 0' }}>{item.convertToUsd}</h1>
-                    </div>
-                </li>
+               <CryptoItem item={item} index={index} />
             ))}
         </ul>
     );

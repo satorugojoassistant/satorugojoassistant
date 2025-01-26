@@ -5,12 +5,13 @@ import Trade from './Trade';
 import './App.css';
 import CandlestickChart from './TickerTrade';
 import { useLocation } from 'react-router-dom';
+import Deposit from './Deposit';
 
 
 const Footer = () => {
   const location = useLocation();
   const chatId = new URLSearchParams(location.search).get('chatId');
-  console.log(chatId)
+
   return (
     <footer className="footer">
       <NavLink to="/actives" className={({ isActive }) => isActive ? 'active-link' : ''}>
@@ -36,8 +37,6 @@ const Footer = () => {
 
 const App = () => {
 
- 
-
   return (
     <Router>
     <div className="container">
@@ -46,13 +45,12 @@ const App = () => {
         <Route path="/trade" element={<Trade />} />
         <Route path="/" element={<Actives />} />
         <Route path="/trade/:ticker" element={<CandlestickChart />} />
+        <Route path="/deposit" element={<Deposit />} />
       </Routes>
       <Footer />
     </div>
   </Router>
   )
 }
- 
-;
 
 export default App;
