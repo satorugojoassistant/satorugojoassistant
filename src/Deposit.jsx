@@ -5,9 +5,18 @@ import { initialCrypto, binance } from './utils'
 
 import CryptoItem from './CryptoItem';
 import CurrencyItem from './CurrecyItem';
-import { Drawer, TextField, InputAdornment } from '@mui/material';
+import { Drawer, TextField, InputAdornment, Button } from '@mui/material';
 import { inputBaseClasses } from '@mui/material/InputBase';
+import axios from 'axios'
+const API_BASE_URL = "https://pay.crypt.bot/api";
 
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+    "Crypto-Pay-API-Token": `329526:AAqVg9KZUxlXPSGq4QLQV2488s2dQ0bmwTd`,
+  },
+});
 
 const Deposit = () => {
     const [crypto, setCrypto] = useState(initialCrypto);
@@ -15,6 +24,7 @@ const Deposit = () => {
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(0);
     const [currency, setCurrency] = useState('rub');
+
 
     useEffect(() => {
         const fetchCryptoPrices = async () => {
@@ -67,11 +77,24 @@ const Deposit = () => {
           ))}
       </ul>
   );
+
+  async function createInvoice() {
+    const formData = new FormData();
+    formData.append('amount', value);
+    formData.append('currency', currency);
+    formData.append('chat_id', localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).chat_id : null);
+
+    axios.post('https://srvocgygtpgzelmmdola.supabase.co/functions/v1/create-invoice', formData, {
+      headers: {
+      'Content-Type': 'multipart/form-data'
+      }
+    });
+  }
   return (
    <>
    <div className='section'>
    <h1 style={{textAlign: 'center'}}>
-    Что ви хотите пополнить?
+    Что вы хотите пополнить?
    </h1>
    </div>
     <section className="section">
@@ -154,6 +177,11 @@ const Deposit = () => {
               {amount}
             </button>
           ))}
+        </div>
+        <div style={{display: 'flex', justifyContent: 'center'}}>
+        <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} onClick={createInvoice}>
+          Пополнить
+        </Button>
         </div>
       </div>
     )}

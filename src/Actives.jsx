@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigation } from 'react-router-dom';
 import CryptoItem from './CryptoItem';
 import CurrencyItem from './CurrecyItem';
 import { initialCrypto, binance } from './utils';
+import {supabase} from './supabase';
 
 
 const Header = () => (
@@ -33,6 +34,34 @@ const Header = () => (
 const Actives = () => {
     const [crypto, setCrypto] = useState(initialCrypto);
     const [rub, setRub] = useState(0);
+    const queryParams = new URLSearchParams(window.location.search);
+    const chatId = queryParams.get('chat_id');
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            const { data, error } = await supabase
+                .from('users')
+                .select('*')
+                .eq('chat_id', chatId)
+                .single();
+
+            if (error) {
+                console.error('Error fetching user:', error);
+            } else {
+                console.log('User data:', data);
+            }
+            if (data) {
+                localStorage.setItem('user', JSON.stringify(data));
+            }
+        };
+
+        if (chatId) {
+            fetchUser();
+        }
+       
+    }, [chatId]);
+    useEffect(() => {
+    }, [])
 
     useEffect(() => {
         const fetchCryptoPrices = async () => {
