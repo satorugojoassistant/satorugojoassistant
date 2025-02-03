@@ -1,5 +1,5 @@
 {
-  "homepage": "https://satorugojoassistant.github.io/satorugojoassistant",
+  "homepage": "https://satorugojoassistant.github.io/web-app",
   "name": "my-app",
   "private": true,
   "version": "0.0.0",
@@ -7,7 +7,7 @@
   "scripts": {
     "build": "vite build",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -b main -d build",
+    "deploy": "gh-pages -d dist",
     "dev": "vite",
     "lint": "eslint .",
     "preview": "vite preview"
