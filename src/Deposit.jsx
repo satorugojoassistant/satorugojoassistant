@@ -19,50 +19,50 @@ const apiClient = axios.create({
 });
 
 const Deposit = () => {
-    const [crypto, setCrypto] = useState(initialCrypto);
-    const [rub, setRub] = useState(0);
-    const [open, setOpen] = useState(false);
-    const [value, setValue] = useState(0);
-    const [currency, setCurrency] = useState('rub');
+  const [crypto, setCrypto] = useState(initialCrypto);
+  const [rub, setRub] = useState(0);
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(0);
+  const [currency, setCurrency] = useState('rub');
 
 
-    useEffect(() => {
-        const fetchCryptoPrices = async () => {
-            const responses = await Promise.all(
-                crypto.filter((c) => c.ticker !== 'USDT').map((item) => fetch(binance + item.ticker + 'USDT'))
-            );
-            const data = await Promise.all(responses.map((res) => res.json()));
+  useEffect(() => {
+      const fetchCryptoPrices = async () => {
+          const responses = await Promise.all(
+              crypto.filter((c) => c.ticker !== 'USDT').map((item) => fetch(binance + item.ticker + 'USDT'))
+          );
+          const data = await Promise.all(responses.map((res) => res.json()));
 
-            setCrypto((prevCrypto) =>
-                prevCrypto.map((item, index) => ({
-                    ...item,
-                    price: item.ticker !== 'USDT' ? Number(data[index].price).toFixed(2) : item.price,
-                }))
-            );
-        };
-        const interva = setInterval(fetchCryptoPrices, 5000);
-        fetchCryptoPrices();
+          setCrypto((prevCrypto) =>
+              prevCrypto.map((item, index) => ({
+                  ...item,
+                  price: item.ticker !== 'USDT' ? Number(data[index].price).toFixed(2) : item.price,
+              }))
+          );
+      };
+      const interva = setInterval(fetchCryptoPrices, 5000);
+      fetchCryptoPrices();
 
-        return () => clearInterval(interva);
+      return () => clearInterval(interva);
 
-    }, []);
+  }, []);
 
-    useEffect(() => {
-        const fetchRubPrice = async () => {
-            const response = await fetch(binance + 'USDTRUB');
-            const data = await response.json();
-            setRub((Number(data.price) + 13).toFixed(2));
-        };
+  useEffect(() => {
+      const fetchRubPrice = async () => {
+          const response = await fetch(binance + 'USDTRUB');
+          const data = await response.json();
+          setRub((Number(data.price) + 13).toFixed(2));
+      };
 
-        fetchRubPrice();
-    }, []);
+      fetchRubPrice();
+  }, []);
 
-    function openCryptoBot() {
-      setCurrency('rub');
-      setOpen(true);
-    }
+  function openCryptoBot() {
+    setCurrency('rub');
+    setOpen(true);
+  }
 
-    const renderCurrencyList = () => (
+  const renderCurrencyList = () => (
       <ul className="currency-list">
           <span onClick={openCryptoBot}>
             <CurrencyItem rub={rub}/>
@@ -90,6 +90,7 @@ const Deposit = () => {
       }
     });
   }
+
   return (
    <>
    <div className='section'>

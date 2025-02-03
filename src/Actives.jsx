@@ -60,8 +60,7 @@ const Actives = () => {
         }
        
     }, [chatId]);
-    useEffect(() => {
-    }, [])
+
 
     useEffect(() => {
         const fetchCryptoPrices = async () => {

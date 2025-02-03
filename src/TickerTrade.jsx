@@ -2,9 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Form, NavLink, useParams } from 'react-router-dom';
 import TockenCard from './components/TockenCard';
 import Chart from 'react-apexcharts';
+import axios from 'axios';
 import { supabase } from './supabase';
 import { Drawer, TextField, InputAdornment, FormControl, ButtonGroup, MenuItem, InputLabel, Button} from '@mui/material';
 import { inputBaseClasses } from '@mui/material/InputBase';
+import { notification, Typography } from 'antd';
+
 
 const buy = {
   padding: '10px 20px',
@@ -33,30 +36,48 @@ const killedPriceTime = 1000;
 
 const CandlestickChart = () => {
   const [series, setSeries] = useState([]);
+  const [amount, setAmount] = useState(0);
   const [time, setTime] = useState('1m');
   const [timeToFinish, setTimeToFinish] = useState('30s');
   const [currentTicker, setCurrentTicker] = useState({});
   const [trade,setTrade] = useState();
+  const [user,setUser] = useState();
   const [currentTickerMath, setCurrentTickerMath] = useState({ price: null, priceChangePercent: 0 });
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [trades, setTrades] = useState([]);
   const startKilled = useRef();
   const stopKilled = useRef();
   const sellPrice = useRef(0);
   const { ticker } = useParams();
-  const [trades, setTrades] = useState([]);
 
   useEffect(() => {
-    const fetchTrades = async () => {
-      const { data, error } = await supabase.from('trades').select('*');
-      if (error) {
-        console.error('Error fetching trades:', error);
-      } else {
-        setTrades(data);
-      }
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
     }
-    const interval = setInterval(fetchTrades, 100000);
-    return () => clearInterval(interval);
-  }, []);
+  }, [])
+
+  useEffect(() => {
+    if (user) {
+      
+
+      fetchUserTrades(user);
+    }
+  }, [user])
+
+  const fetchUserTrades = async (user) => {
+    const { data, error } = await supabase
+      .from('trades')
+      .select('*')
+      .eq('chat_id', user.chat_id)
+      .eq('token', ticker);
+    if (error) {
+      console.error('Error fetching user trades:', error);
+    } else {
+      setTrades(data);
+      console.log(data);
+    }
+  };
 
   useEffect(() => {
     const fetchTicker = async () => {
@@ -149,6 +170,13 @@ const CandlestickChart = () => {
   };
 
   const handleBuyClick = (trade) => {
+    if(!user.is_trading_enable) {
+      notification.error({
+        message: 'Ошибка',
+        description: 'Торговля временно недоступна',
+      })
+      return 
+    } 
     setDrawerOpen(true);
     setTrade(trade);
     
@@ -159,6 +187,8 @@ const CandlestickChart = () => {
     }
     startKilled.current = Date.now();
     stopKilled.current = Date.now() + killedPriceTime;
+
+    
   };
 
   const toggleDrawer = (open) => (event) => {
@@ -170,6 +200,32 @@ const CandlestickChart = () => {
 
   const handeTimeChange = (time) => {
     setTimeToFinish(time);
+  }
+
+  async function startTrade() {
+    console.log('start trade');
+    if (amount <= 0) {
+      return
+    }
+    const formData = new FormData();
+    formData.append('chat_id', user.chat_id);
+    formData.append('ticker', currentTicker.ticker);
+    formData.append('trade_type', trade);
+    formData.append('price', currentTickerMath.price);
+    formData.append('amount', amount);
+    formData.append('time_to_finish', timeToFinish);
+    try{
+      const res = await axios.post('https://srvocgygtpgzelmmdola.supabase.co/functions/v1/create-trade', formData, {
+        headers: {
+        'Content-Type': 'multipart/form-data'
+        }
+      });
+    } catch (e){
+      console.log(e)
+    }
+    await fetchUserTrades(user);
+
+    setDrawerOpen(false);
   }
 
   return (
@@ -228,6 +284,8 @@ const CandlestickChart = () => {
             label="Количество"
             variant="standard"
             type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
             color="primary"
             sx={{
               maxWidth: '200px',
@@ -289,12 +347,33 @@ const CandlestickChart = () => {
 
           </div>
 
-          <button style={{...(trade === 'buy' ? buy : sell), marginTop: '5px', width: '100vw'}}>
+          <button style={{...(trade === 'buy' ? buy : sell), marginTop: '5px', width: '100vw'}} onClick={startTrade}>
             {trade === 'buy' ? 'Купить': 'Продать'}
           </button>
 
         </div>
       </Drawer>
+
+      <div style={{display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '10px'}}>
+        {trades.sort((a,b) => b.id - a.id).slice(0,5).map((trade) => (
+          <div style={{padding: '4px',border: trade.isActive ? '1px solid #007bff' : 'inherit', borderWidth: '1px', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', borderRadius: '10px'}}>
+            <div style={{display: 'flex', flexDirection: 'column'}}>
+            <Typography.Text style={{color:'whitesmoke'}}>{trade.amount} USDT</Typography.Text>
+            <Typography.Text style={{color: trade.trade_type === 'buy' ? 'green' : 'red'}}>{trade.trade_type === 'buy' ? 'Покупка' : 'Продажа'}</Typography.Text>
+            </div>
+            <div style={{display: 'flex', flexDirection: 'column'}}>
+              <Typography.Text style={{color: trade.isWin ? 'green' : trade.isWin !== null ? 'red' : 'white' }}>{trade.isWin ? '+' : trade.isWin !== null ? '-' : ''}{parseFloat(trade.amount) * 0.7} USDT</Typography.Text>
+              <Typography.Text style={{color: 'gray'}}>{ new Date(trade.created_at).toLocaleString('en-GB', {
+              day: '2-digit',
+              month: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}</Typography.Text>  
+            
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

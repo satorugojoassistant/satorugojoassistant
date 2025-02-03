@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, NavLink } from 'react-router-dom';
 import Actives from './Actives';
 import Trade from './Trade';
@@ -6,6 +6,7 @@ import './App.css';
 import CandlestickChart from './TickerTrade';
 import { useLocation } from 'react-router-dom';
 import Deposit from './Deposit';
+import { supabase } from './supabase';
 
 
 const Footer = () => {
@@ -36,7 +37,31 @@ const Footer = () => {
 }
 
 const App = () => {
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if(user) {
+      const fetchUser = async () => {
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('chat_id', user.chat_id)
+            .single();
 
+        if (error) {
+            console.error('Error fetching user:', error);
+        } else {
+            console.log('User data:', data);
+        }
+        if (data) {
+            localStorage.setItem('user', JSON.stringify(data));
+        }
+    };
+
+    if (user.chat_id) {
+        fetchUser();  
+    }
+  }
+  }, [])
   return (
     <Router>
     <div className="container">
