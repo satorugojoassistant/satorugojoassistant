@@ -7,7 +7,7 @@
   "scripts": {
     "build": "vite build",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -b master -d build",
+    "deploy": "gh-pages -b main -d build",
     "dev": "vite",
     "lint": "eslint .",
     "preview": "vite preview"
