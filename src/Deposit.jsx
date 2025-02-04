@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import './App.css'
 
 import { initialCrypto, binance } from './utils'
-
+import { useNavigate } from 'react-router-dom';
 import CryptoItem from './CryptoItem';
 import CurrencyItem from './CurrecyItem';
 import { Drawer, TextField, InputAdornment, Button } from '@mui/material';
@@ -24,6 +24,7 @@ const Deposit = () => {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(0);
   const [currency, setCurrency] = useState('rub');
+  const navigation = useNavigate()
 
 
   useEffect(() => {
@@ -83,14 +84,18 @@ const Deposit = () => {
     formData.append('amount', value);
     formData.append('currency', currency);
     formData.append('chat_id', localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).chat_id : null);
-
-    await axios.post('https://srvocgygtpgzelmmdola.supabase.co/functions/v1/create-invoice', formData, {
-      headers: {
-      'Content-Type': 'multipart/form-data'
-      }
-    });
-
-    window.location.href = '/';
+    try{
+      await axios.post('https://srvocgygtpgzelmmdola.supabase.co/functions/v1/create-invoice', formData, {
+        headers: {
+        'Content-Type': 'multipart/form-data'
+        }
+      });
+    } catch (e) {
+      console.log(e);
+    }
+   
+    navigation('/actives');
+   
   }
 
   return (
