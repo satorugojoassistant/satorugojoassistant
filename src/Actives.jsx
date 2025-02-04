@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { NavLink, useNavigation } from 'react-router-dom';
 import CryptoItem from './CryptoItem';
 import CurrencyItem from './CurrecyItem';
@@ -33,7 +33,9 @@ const Header = () => (
 
 const Actives = () => {
     const [crypto, setCrypto] = useState(initialCrypto);
+    const [trades, setTrades] = useState([]);
     const [rub, setRub] = useState(0);
+    const [user, setUser] = useState();
     const queryParams = new URLSearchParams(window.location.search);
     const chatId = queryParams.get('chat_id');
 
@@ -51,15 +53,48 @@ const Actives = () => {
                 console.log('User data:', data);
             }
             if (data) {
+
                 localStorage.setItem('user', JSON.stringify(data));
+                setUser(data)
             }
         };
 
+        const fetchTrades = async () => {
+            const { data, error } = await supabase
+                .from('trades')
+                .select('*')
+                .eq('chat_id', chatId);
+
+            if (error) {
+                console.error('Error fetching trades:', error);
+            } else {
+                console.log('Trades data:', data);
+                setTrades(data);
+            }
+        }
+
         if (chatId) {
             fetchUser();
+            fetchTrades()
         }
        
     }, [chatId]);
+
+
+    const tradesStat = useMemo(() => {
+        const tradesTwo = trades.filter((trade) => !trade.isActive).reduce((acc, trade) => {
+            if (trade.isWin) {
+                return {...acc, isWin: acc.isWin + 1, amount: acc.amount + trade.amount}
+            } else {
+                return {...acc, isLoss: acc.isLoss + 1, amount: acc.amount + trade.amount}
+            }
+        }, {isWin: 0, isLoss: 0, amount: 0});
+        console.log(tradesTwo)
+
+        return tradesTwo
+    }, [trades])
+
+    
 
 
     useEffect(() => {
@@ -135,11 +170,11 @@ const Actives = () => {
             <Header />
             <section className="section" style={{border: 0}}>
                 <h2>Профиль</h2>
-                <strong>676132075</strong>
+                <strong>{user?.chat_id}</strong>
                 <p>ID аккаунта </p>
-                <strong>0 / <span className='win'>0</span> / <span className='loss'>0</span></strong>
+                <strong>{(tradesStat?.isWin + tradesStat?.isLoss) || 0} / <span className='win'>{tradesStat?.isWin || 0}</span> / <span className='loss'>{tradesStat?.isLoss || 0}</span></strong>
                 <p>Статистика</p>
-                <strong>0,00 USDT</strong>
+                <strong>{tradesStat?.amount} USDT</strong>
                 <p>Объем торгов</p>
             </section>
 

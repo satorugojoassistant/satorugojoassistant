@@ -230,6 +230,16 @@ const CandlestickChart = () => {
 
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#020230', color: 'white', width: '100%', height:'100%', boxSizing:'border-box', padding:'10px' }}>
+      
+      <NavLink to='/trade'>
+      <Button
+        variant="contained"
+        color="primary"
+        style={{ marginBottom: '20px', backgroundColor: '#1e3c72', color: 'white' }}
+      >
+        Назад
+      </Button>
+      </NavLink>
       <Chart options={options} series={series} type="candlestick" height={350} width={'100%'}/>
       {currentTickerMath.price && currentTicker.ticker && (
         <NavLink to="/trade">

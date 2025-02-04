@@ -43,7 +43,7 @@ body {
 
 .header h2 {
   margin: 5px 0 20px;
-  font-size: 1rem;
+  font-size: 2rem;
 }
 
 .header img {
@@ -55,7 +55,7 @@ body {
 }
 
 .header h1 {
-  font-size: 1rem;
+  font-size: 1.5rem;
   color: var(--header-text-color);
   margin: 0;
 }
