@@ -58,14 +58,14 @@ const Deposit = () => {
       fetchRubPrice();
   }, []);
 
-  function openCryptoBot() {
-    setCurrency('rub');
+  function openCryptoBot(currency) {
+    setCurrency(currency);
     setOpen(true);
   }
 
   const renderCurrencyList = () => (
       <ul className="currency-list">
-          <span onClick={openCryptoBot}>
+          <span onClick={() => openCryptoBot('rub')}>
             <CurrencyItem rub={rub}/>
           </span>
       </ul>
@@ -74,7 +74,9 @@ const Deposit = () => {
   const renderCryptoList = () => (
       <ul className="crypto-list">
           {crypto.map((item, index) => (
-             <CryptoItem item={item} index={index} />
+            <span index={index} onClick={() => openCryptoBot(item.ticker)}>
+                <CryptoItem item={item}  />
+            </span>
           ))}
       </ul>
   );
@@ -194,8 +196,83 @@ const Deposit = () => {
       </div>
     )}
 
-    {currency === 'usdt' && (
+    {currency !== 'rub' && (
       <>
+      <div style={{height: '400px', backgroundColor: '#12192C', padding: '10px'}} >
+        <h2 style={{color: 'white'}}>Bы покупаете <span style={{color: '#0056b3', fontWeight: 600}}>{currency.toUpperCase()}</span></h2>
+        <TextField
+            id="outlined-suffix-shrink"
+            label="Количество"
+            variant="standard"
+            type="number"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            color="primary"
+            sx={{
+              maxWidth: '200px',
+              '& .MuiInputBase-root': {
+                color: 'white',
+              },
+              '& .MuiInputLabel-root': {
+                color: 'white',
+              },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: 'white',
+                },
+                '&:hover fieldset': {
+                  borderColor: 'white',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: 'white',
+                },
+              },
+            }}
+            required
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment
+                    position="end"
+                    sx={{
+                      opacity: 0,
+                      pointerEvents: 'none',
+                      [`[data-shrink=true] ~ .${inputBaseClasses.root} > &`]: {
+                        opacity: 1,
+                      },
+                    }}
+                  >
+                    <p style={{color: '#B0B8C1'}}>{currency.toUpperCase()}</p>
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+        <div style={{ marginTop: '20px' }}>
+          {[50, 100, 200, 500].map((amount) => (
+            <button
+              key={amount}
+              onClick={() => setValue(amount)}
+              style={{
+                margin: '5px',
+                padding: '10px 20px',
+                border: '1px solid #0056b3',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                backgroundColor: amount === value ? '#0056b3' : 'transparent',
+                color: amount === value ? '#fff' : '#0056b3',
+              }}
+            >
+              {amount}
+            </button>
+          ))}
+        </div>
+        <div style={{display: 'flex', justifyContent: 'center'}}>
+        <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} onClick={createInvoice}>
+          Пополнить
+        </Button>
+        </div>
+      </div>
       </>
     )}
     
