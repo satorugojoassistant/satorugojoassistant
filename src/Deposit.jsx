@@ -7,6 +7,8 @@ import CryptoItem from './CryptoItem';
 import CurrencyItem from './CurrecyItem';
 import { Drawer, TextField, InputAdornment, Button } from '@mui/material';
 import { inputBaseClasses } from '@mui/material/InputBase';
+import { Form, NavLink } from 'react-router-dom';
+
 import axios from 'axios'
 const API_BASE_URL = "https://pay.crypt.bot/api";
 
@@ -97,12 +99,20 @@ const Deposit = () => {
     }
    
     navigation('/actives');
-   
   }
-
   return (
    <>
    <div className='section'>
+   <NavLink to='/actives'>
+      <Button
+        variant="contained"
+        color="primary"
+        style={{ marginBottom: '20px', backgroundColor: '#1e3c72', color: 'white' }}
+      >
+        Назад
+      </Button>
+    </NavLink>
+
    <h1 style={{textAlign: 'center'}}>
     Что вы хотите пополнить?
    </h1>

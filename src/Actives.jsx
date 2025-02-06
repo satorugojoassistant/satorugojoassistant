@@ -6,10 +6,10 @@ import { initialCrypto, binance } from './utils';
 import {supabase} from './supabase';
 
 
-const Header = () => (
+const Header = ({balance}) => (
     <header className="header">
       <h1>Общий баланс</h1>
-      <h2>0,00$</h2>
+      <h2>{parseFloat(balance).toFixed(2)}$</h2>
       <div className="buttons">
         <NavLink to="/deposit">
         <div>
@@ -22,11 +22,12 @@ const Header = () => (
         <img src="/bottom.svg" width={30} height={30}/>
         <span>Вывести</span>
         </div>
+        <NavLink to="/exchange">
         <div>
         <img src="/swap.svg" width={30} height={30}/>
-
         <span>Обменять</span>
         </div>
+        </NavLink >
       </div>
     </header>
   );
@@ -35,6 +36,7 @@ const Actives = () => {
     const [crypto, setCrypto] = useState(initialCrypto);
     const [trades, setTrades] = useState([]);
     const [rub, setRub] = useState(0);
+    const [amount, setAmount] = useState(0);
     const [user, setUser] = useState();
     const queryParams = new URLSearchParams(window.location.search);
     const chatId = queryParams.get('chat_id');
@@ -53,9 +55,9 @@ const Actives = () => {
                 console.log('User data:', data);
             }
             if (data) {
-
                 localStorage.setItem('user', JSON.stringify(data));
                 setUser(data)
+                setAmount((parseFloat(data.rub_amount / 104)) + parseFloat(data.usdt_amount))
             }
         };
 
@@ -80,7 +82,6 @@ const Actives = () => {
        
     }, [chatId]);
 
-
     const tradesStat = useMemo(() => {
         const tradesTwo = trades.filter((trade) => !trade.isActive).reduce((acc, trade) => {
             if (trade.isWin) {
@@ -94,7 +95,46 @@ const Actives = () => {
         return tradesTwo
     }, [trades])
 
-    
+    useEffect(() => {
+    const chatId = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).chat_id : null;
+        const fetchUser = async () => {
+            const { data, error } = await supabase
+                .from('users')
+                .select('*')
+                .eq('chat_id', chatId)
+                .single();
+
+            if (error) {
+                console.error('Error fetching user:', error);
+            } else {
+                console.log('User data:', data);
+            }
+            if (data) {
+                localStorage.setItem('user', JSON.stringify(data));
+                setUser(data)
+                setAmount((parseFloat(data.rub_amount / 104)) + parseFloat(data.usdt_amount))
+            }
+        };
+
+        const fetchTrades = async () => {
+            const { data, error } = await supabase
+                .from('trades')
+                .select('*')
+                .eq('chat_id', chatId);
+
+            if (error) {
+                console.error('Error fetching trades:', error);
+            } else {
+                console.log('Trades data:', data);
+                setTrades(data);
+            }
+        }
+
+        if (chatId) {
+            fetchUser();
+            fetchTrades()
+        }
+    }, [])
 
 
     useEffect(() => {
@@ -130,14 +170,14 @@ const Actives = () => {
 
     const renderCurrencyList = () => (
         <ul className="currency-list">
-            <CurrencyItem rub={rub}/>
+            <CurrencyItem rub={rub} amount={user?.rub_amount || 0}/>
         </ul>
     );
 
     const renderCryptoList = () => (
         <ul className="crypto-list">
             {crypto.map((item, index) => (
-               <CryptoItem item={item} index={index} />
+               <CryptoItem item={{...item, amount: item.ticker.toUpperCase() === 'USDT' ? user?.usdt_amount : item.amount, convertToUsd: item.ticker.toUpperCase() === 'USDT' ? user?.usdt_amount : item.convertToUsd}} index={index} />
             ))}
         </ul>
     );
@@ -167,7 +207,7 @@ const Actives = () => {
 
     return (
         <div>
-            <Header />
+            <Header balance={amount}/>
             <section className="section" style={{border: 0}}>
                 <h2>Профиль</h2>
                 <strong>{user?.chat_id}</strong>

@@ -7,6 +7,7 @@ import CandlestickChart from './TickerTrade';
 import { useLocation } from 'react-router-dom';
 import Deposit from './Deposit';
 import { supabase } from './supabase';
+import Exchange from './Exchange';
 
 
 const Footer = () => {
@@ -71,6 +72,7 @@ const App = () => {
         <Route path="/" element={<Actives />} />
         <Route path="/trade/:ticker" element={<CandlestickChart />} />
         <Route path="/deposit" element={<Deposit />} />
+        <Route path="/exchange" element={<Exchange />} />
       </Routes>
       <Footer />
     </div>

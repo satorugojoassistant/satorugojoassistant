@@ -12,7 +12,7 @@ const CryptoItem = ({ item, index }) => {
       </div>
       <div>
         <p style={{ margin: '5px 0', textAlign: 'end', fontWeight: 700 }}>{item.amount}</p>
-        <h1 style={{ margin: '5px 0' }}>{item.convertToUsd}</h1>
+        <h1 style={{ margin: '5px 0' }}>{item.convertToUsd} $</h1>
       </div>
     </li>
   );

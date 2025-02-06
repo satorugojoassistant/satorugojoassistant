@@ -1,6 +1,6 @@
 import React from 'react';
 
-const CurrencyItem = ({rub}) => {
+const CurrencyItem = ({rub, amount}) => {
   return (
     <li>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -10,7 +10,7 @@ const CurrencyItem = ({rub}) => {
                 <p style={{ margin: '5px 0' }} className='crypto-list-price'>{rub} ₽</p>
             </div>
         </div>
-        {0} ₽
+        {amount} ₽
     </li>
   );
 };
