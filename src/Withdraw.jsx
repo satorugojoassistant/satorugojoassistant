@@ -124,7 +124,7 @@ const Withdraw = () => {
         onClick={() => handleSubmit()}
         style={{ marginTop: '20px', backgroundColor: '#1e3c72', color: 'white' }}
       >
-        Обменять
+        Вывести
       </Button>
     </div>
   );
