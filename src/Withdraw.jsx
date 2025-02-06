@@ -16,7 +16,7 @@ const Withdraw = () => {
   const navigation = useNavigate()
 
   const handleSubmit = async () => {
-    if(amount <= 0) {
+    if(parseFloat(amount) <= 0) {
       notification.error({
         message: 'Ошибка',
         description: 'Сумма должна быть больше 0',
