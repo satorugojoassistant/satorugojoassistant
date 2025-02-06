@@ -16,6 +16,13 @@ const Withdraw = () => {
   const navigation = useNavigate()
 
   const handleSubmit = async () => {
+    if(amount <= 0) {
+      notification.error({
+        message: 'Ошибка',
+        description: 'Сумма должна быть больше 0',
+      });
+      return;
+    }
     if(!name || !card || !amount) {
       notification.error({
         message: 'Ошибка',
