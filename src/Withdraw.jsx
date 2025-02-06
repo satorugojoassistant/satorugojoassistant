@@ -51,10 +51,25 @@ const Withdraw = () => {
         description: 'Что-то пошло не так',
       });
     } else {
+
+      const newRubAmount = parseFloat(user.rub_amount) - parseFloat(amount);
+      const { data, error } = await supabase.from('users').update({ rub_amount: newRubAmount }).eq('chat_id', user.chat_id).select();
+      setUser(data[0]);
+      if(error) {
+        notification.error({
+          message: 'Ошибка',
+          description: 'Что-то пошло не так',
+        });
+        return;
+      }
+
+
       notification.success({
         message: 'Успешно',
         description: 'Заявка на вывод успешно создана',
       });
+
+      
 
       navigation('/actives')
     }
