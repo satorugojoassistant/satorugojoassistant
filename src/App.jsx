@@ -8,6 +8,7 @@ import { useLocation } from 'react-router-dom';
 import Deposit from './Deposit';
 import { supabase } from './supabase';
 import Exchange from './Exchange';
+import Withdraw from './Withdraw';
 
 
 const Footer = () => {
@@ -73,6 +74,7 @@ const App = () => {
         <Route path="/trade/:ticker" element={<CandlestickChart />} />
         <Route path="/deposit" element={<Deposit />} />
         <Route path="/exchange" element={<Exchange />} />
+        <Route path="/withdraw" element={<Withdraw />} />
       </Routes>
       <Footer />
     </div>

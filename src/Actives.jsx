@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { NavLink, useNavigation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import CryptoItem from './CryptoItem';
 import CurrencyItem from './CurrecyItem';
 import { initialCrypto, binance } from './utils';
@@ -17,11 +17,12 @@ const Header = ({balance}) => (
         <span>Пополнить</span>
         </div>
         </NavLink>
-
+        <NavLink to="/withdraw">
         <div>
         <img src="/bottom.svg" width={30} height={30}/>
         <span>Вывести</span>
         </div>
+        </NavLink>
         <NavLink to="/exchange">
         <div>
         <img src="/swap.svg" width={30} height={30}/>
