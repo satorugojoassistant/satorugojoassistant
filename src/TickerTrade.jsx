@@ -51,9 +51,29 @@ const CandlestickChart = () => {
   const { ticker } = useParams();
 
   useEffect(() => {
+    const fetchUser = async () => {
+      const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('chat_id',  JSON.parse(storedUser).chat_id)
+          .single();
+
+      if (error) {
+          console.error('Error fetching user:', error);
+      } else {
+          console.log('User data:', data);
+      }
+      if (data) {
+          localStorage.setItem('user', JSON.stringify(data));
+          setUser(data)
+          console.log('data', data)
+      }
+  };
+
     const storedUser = localStorage.getItem('user');
+    
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      fetchUser()
     }
   }, [])
 
@@ -205,6 +225,20 @@ const CandlestickChart = () => {
   async function startTrade() {
     console.log('start trade');
     if (amount <= 0) {
+      notification.error({
+        message: 'Ошибка',
+        description: 'Сумма должна быть больше 0',
+      })
+
+      return
+    }
+
+
+    if (parseFloat(amount) > parseFloat(user.usdt_amount)) {
+      notification.error({
+        message: 'Ошибка',
+        description: 'Недостаточно средств',
+      })
       return
     }
     const formData = new FormData();
@@ -224,6 +258,10 @@ const CandlestickChart = () => {
       console.log(e)
     }
     await fetchUserTrades(user);
+    const newUsdtAmount = (parseFloat(user.usdt_amount) - parseFloat(amount)).toFixed(2);
+    setUser({...user, usdt_amount: newUsdtAmount})
+    localStorage.setItem('user', JSON.stringify({...user, usdt_amount: newUsdtAmount}));
+    await supabase.from('users').update({usdt_amount: newUsdtAmount}).eq('chat_id', user.chat_id).select();
 
     setDrawerOpen(false);
   }
@@ -240,6 +278,8 @@ const CandlestickChart = () => {
         Назад
       </Button>
       </NavLink>
+
+      <span style={{display: 'flex', justifyContent: 'center'}}>Баланс: {user?.usdt_amount} USDT</span>
       <Chart options={options} series={series} type="candlestick" height={350} width={'100%'}/>
       {currentTickerMath.price && currentTicker.ticker && (
         <NavLink to="/trade">
@@ -281,7 +321,7 @@ const CandlestickChart = () => {
         </button>
       </div>
 
-      <Drawer anchor="bottom" open={drawerOpen} onClose={toggleDrawer(false)} style={{width: '100%', boxSizing: 'border-box',  }}>
+      <Drawer anchor="bottom" open={drawerOpen} onClose={toggleDrawer(false)} style={{width: '100%', boxSizing: 'border-box' }}>
         <div
           role="presentation"
           style={{ width: '100%', boxSizing:'border-box', height: '400px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', backgroundColor: '#12192C', color: 'white', paddingBottom: '10px'}}
@@ -337,7 +377,7 @@ const CandlestickChart = () => {
               },
             }}
           />
-          <p>Доступно: 0 USDT</p>
+          <p>Доступно: {user?.usdt_amount} USDT</p>
           <FormControl sx={{minWidth: 120}} required>
           <ButtonGroup
           sx={{display: 'flex', justifyContent: 'space-around', gap: '5px', flexWrap: 'wrap'}}
@@ -372,7 +412,7 @@ const CandlestickChart = () => {
             <Typography.Text style={{color: trade.trade_type === 'buy' ? 'green' : 'red'}}>{trade.trade_type === 'buy' ? 'Покупка' : 'Продажа'}</Typography.Text>
             </div>
             <div style={{display: 'flex', flexDirection: 'column'}}>
-              <Typography.Text style={{color: trade.isWin ? 'green' : trade.isWin !== null ? 'red' : 'white' }}>{trade.isWin ? '+' : trade.isWin !== null ? '-' : ''}{parseFloat(trade.amount) * 0.7} USDT</Typography.Text>
+              <Typography.Text style={{color: trade.isWin ? 'green' : trade.isWin !== null ? 'red' : 'white' }}>{trade.isWin ? '+' : trade.isWin !== null ? '-' : ''}{parseFloat(trade.amount) * 0.75} USDT</Typography.Text>
               <Typography.Text style={{color: 'gray'}}>{ new Date(trade.created_at).toLocaleString('en-GB', {
               day: '2-digit',
               month: '2-digit',
