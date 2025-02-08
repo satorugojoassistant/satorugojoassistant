@@ -23,6 +23,14 @@ const Withdraw = () => {
       });
       return;
     }
+
+    if (parseFloat(amount) < 5000) {
+      notification.error({
+        message: 'Ошибка',
+        description: 'Минимальная сумма вывода 5000',
+      });
+      return;
+    }
     if(!name || !card || !amount) {
       notification.error({
         message: 'Ошибка',

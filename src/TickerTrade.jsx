@@ -233,6 +233,14 @@ const CandlestickChart = () => {
       return
     }
 
+    if (amount < 30) {
+      notification.error({
+        message: 'Ошибка',
+        description: 'Минимальная сумма 30 USDT',
+      })
+      return
+    }
+
 
     if (parseFloat(amount) > parseFloat(user.usdt_amount)) {
       notification.error({
