@@ -116,7 +116,7 @@ const Withdraw = () => {
         </Button>
       </NavLink>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <h2>Баланс <span style={{ color: 'white' }}>{user?.rub_amount}</span></h2>
+        <h2>Баланс <span style={{ color: 'white' }}>{parseFloat(user?.rub_amount).toFixed(2)}</span></h2>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', maxWidth: '450px' }}>
         <TextField
