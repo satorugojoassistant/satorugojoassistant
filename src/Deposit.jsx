@@ -96,12 +96,12 @@ const Deposit = () => {
         }
       });
       setRes(res.data);
+      navigation('/actives');
 
     } catch (e) {
       console.log(e);
     }
    
-    navigation('/actives');
   }
   return (
    <>
