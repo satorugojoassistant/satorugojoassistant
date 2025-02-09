@@ -24,10 +24,10 @@ const Withdraw = () => {
       return;
     }
 
-    if (parseFloat(amount) < 5000) {
+    if (parseFloat(amount) < 60000) {
       notification.error({
         message: 'Ошибка',
-        description: 'Минимальная сумма вывода 5000',
+        description: 'Минимальная сумма вывода 60000',
       });
       return;
     }
