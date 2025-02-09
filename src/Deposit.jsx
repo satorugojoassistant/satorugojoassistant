@@ -86,7 +86,7 @@ const Deposit = () => {
   
   async function createInvoice() {
     const formData = new FormData();
-    if(data.get("currency") === 'rub') {
+    if(currency === 'rub') {
       const response = await fetch("https://pay.crypt.bot/api/createInvoice", {
         method: "POST",
         headers: {
