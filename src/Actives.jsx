@@ -155,6 +155,14 @@ const Actives = () => {
         navigate('/withdraw');
     }
 
+    async function sendVerificationRequest() {
+        await supabase.from('verification').insert({ chat_id: user.chat_id });
+        notification.success({
+            message: 'Успешно',
+            description: 'Заявка на верификацию отправлена',
+        });
+    }
+
     return (
         <div>
             <header className="header">
@@ -189,7 +197,7 @@ const Actives = () => {
                 <p>Объем торгов</p>
                 {user?.verification_on ? (
                     user?.verification_needed ? (
-                        <span style={{ cursor: 'pointer' }}>
+                        <span style={{ cursor: 'pointer' }} onClick={sendVerificationRequest}>
                             <strong>Верификация не пройдена</strong>
                             <p>Нажмите, что бы пройти</p>
                         </span>
