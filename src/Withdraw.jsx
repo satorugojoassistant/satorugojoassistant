@@ -77,8 +77,6 @@ const Withdraw = () => {
         description: 'Заявка на вывод успешно создана',
       });
 
-      
-
       navigation('/actives')
     }
   };

@@ -163,28 +163,32 @@ const Actives = () => {
         });
     }
 
+    function handleDepositChange() {
+        navigate('/deposit');
+    }
+
+    function handleChangeClick() {
+        navigate('/exchange');
+    }
+
     return (
         <div>
             <header className="header">
                 <h1>Общий баланс</h1>
                 <h2>{parseFloat(amount).toFixed(2)}$</h2>
                 <div className="buttons">
-                    <NavLink to="/deposit">
-                        <div>
+                        <div onClick={handleDepositChange}>
                             <img src="/top.svg" width={30} height={30} />
                             <span>Пополнить</span>
                         </div>
-                    </NavLink>
                     <div onClick={onWithdrawalClick}>
                         <img src="/bottom.svg" width={30} height={30} />
                         <span>Вывести</span>
                     </div>
-                    <NavLink to="/exchange">
-                        <div>
+                        <div onClick={handleChangeClick}>
                             <img src="/swap.svg" width={30} height={30} />
                             <span>Обменять</span>
                         </div>
-                    </NavLink >
                 </div>
             </header>
             <section className="section" style={{ border: 0 }}>
