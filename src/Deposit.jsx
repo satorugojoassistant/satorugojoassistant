@@ -87,20 +87,18 @@ const Deposit = () => {
   async function createInvoice() {
     const formData = new FormData();
     if(currency === 'rub') {
-      const response = await fetch("https://pay.crypt.bot/api/createInvoice", {
-        method: "POST",
-        headers: {
+      const headers = {
           "Content-Type": "application/json",
           "Crypto-Pay-API-Token": "329526:AAqVg9KZUxlXPSGq4QLQV2488s2dQ0bmwTd"
-        },
-        body: JSON.stringify({
-          // Add the necessary payload here
-          fiat: 'RUB',
+      }
+
+      const body = {
+      fiat: 'RUB',
           amount: value,
           currency_type: 'fiat',
           "accepted_assets": "USDT,USDC"
-        }),
-      });
+      }
+      const response = await axios.post("https://pay.crypt.bot/api/createInvoice", body, {headers: headers});
       const result = await response.json();
       const res = result.result
   
