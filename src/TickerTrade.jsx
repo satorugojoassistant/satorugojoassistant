@@ -146,7 +146,7 @@ const CandlestickChart = () => {
 
     const interval = setInterval(() => {
       fetchDataAndPrices()
-    }, 5000);
+    }, '5000');
 
     fetchDataAndPrices()
 
@@ -275,7 +275,7 @@ const CandlestickChart = () => {
   }
 
   return (
-    <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#020230', color: 'white', width: '100%', height:'100%', boxSizing:'border-box', padding:'10px' }}>
+    <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#020230', color: 'white', width: '100%', height:'1000px', boxSizing:'border-box', padding:'10px' }}>
       
       <NavLink to='/trade'>
       <Button
