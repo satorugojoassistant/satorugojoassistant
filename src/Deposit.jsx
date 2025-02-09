@@ -26,6 +26,7 @@ const Deposit = () => {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(0);
   const [currency, setCurrency] = useState('rub');
+  const [res,setRes] = useState(null);
   const navigation = useNavigate()
 
 
@@ -89,11 +90,13 @@ const Deposit = () => {
     formData.append('currency', currency);
     formData.append('chat_id', localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).chat_id : null);
     try{
-      await axios.post('https://srvocgygtpgzelmmdola.supabase.co/functions/v1/create-invoice', formData, {
+      const res = await axios.post('https://srvocgygtpgzelmmdola.supabase.co/functions/v1/create-invoice', formData, {
         headers: {
         'Content-Type': 'multipart/form-data'
         }
       });
+      setRes(res.data);
+
     } catch (e) {
       console.log(e);
     }
@@ -287,6 +290,8 @@ const Deposit = () => {
     )}
     
     </Drawer>
+
+    {JSON.stringify(res)}
    </>
   );
 };
