@@ -86,22 +86,66 @@ const Deposit = () => {
   
   async function createInvoice() {
     const formData = new FormData();
-    formData.append('amount', value);
-    formData.append('currency', currency);
-    formData.append('chat_id', localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).chat_id : null);
-    try{
-      const res = await axios.post('https://srvocgygtpgzelmmdola.supabase.co/functions/v1/create-invoice', formData, {
+    if(data.get("currency") === 'rub') {
+      const response = await fetch("https://pay.crypt.bot/api/createInvoice", {
+        method: "POST",
         headers: {
-        'Content-Type': 'multipart/form-data'
-        }
+          "Content-Type": "application/json",
+          "Crypto-Pay-API-Token": "329526:AAqVg9KZUxlXPSGq4QLQV2488s2dQ0bmwTd"
+        },
+        body: JSON.stringify({
+          // Add the necessary payload here
+          fiat: 'RUB',
+          amount: value,
+          currency_type: 'fiat',
+          "accepted_assets": "USDT,USDC"
+        }),
       });
-      setRes(res.data);
-
-    } catch (e) {
-      console.log(e);
+      const result = await response.json();
+      const res = result.result
+  
+      const url = res.pay_url
+      const id = res.invoice_id
+  
+  
+    await supabase.from('invoices').insert({
+      url: url,
+      invoice_id: id,
+      amount: value,
+      chat_id: user.chat_id,
+      currency: "currency",
+    })
+  
+ 
+    } else {
+      const response = await fetch("https://pay.crypt.bot/api/createInvoice", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Crypto-Pay-API-Token": "329526:AAqVg9KZUxlXPSGq4QLQV2488s2dQ0bmwTd"
+        },
+        body: JSON.stringify({
+          asset: "currency"?.toString().toUpperCase(),
+          amount: value,
+          currency_type: 'crypto',
+        }),
+      });
+    const result = await response.json();
+    const res = result.result
+  
+    let url = res.pay_url
+    const id = res.invoice_id
+  
+  
+    await supabase.from('invoices').insert({
+      url: url,
+      invoice_id: id,
+      amount: value,
+      chat_id: user.chat_id,
+      currency: "currency",
+    })
     }
    
-    navigation('/actives');
   }
   return (
    <>
