@@ -84,55 +84,21 @@ const Deposit = () => {
   );
   
   async function createInvoice() {
-    const headers = {
-      "Content-Type": "application/json",
-      "Crypto-Pay-API-Token": "329526:AAqVg9KZUxlXPSGq4QLQV2488s2dQ0bmwTd"
-    }
-    const body = {
-      fiat: 'RUB',
-      amount: value,
-      currency_type: 'fiat',
-      "accepted_assets": "USDT,USDC"
-    }
-    console.log(currency)
-    if(currency === 'rub') {
-      const response = await axios.post("https://pay.crypt.bot/api/createInvoice", body, {headers: headers});
-      const result = await response.json();
-      const res = result.result
-  
-      const url = res.pay_url
-      const id = res.invoice_id
-  
-  
-    await supabase.from('invoices').insert({
-      url: url,
-      invoice_id: id,
-      amount: value,
-      chat_id: user.chat_id,
-      currency: currency,
-    })
-  
-    } else {
-      const response = await fetch("https://pay.crypt.bot/api/createInvoice", {
-        method: "POST",
+    const formData = new FormData();
+    formData.append('amount', value);
+    formData.append('currency', currency);
+    formData.append('chat_id', localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).chat_id : null);
+    try{
+      await axios.post('https://srvocgygtpgzelmmdola.supabase.co/functions/v1/create-invoice', formData, {
         headers: {
-          "Content-Type": "application/json",
-          "Crypto-Pay-API-Token": "329526:AAqVg9KZUxlXPSGq4QLQV2488s2dQ0bmwTd"
-        },
-        body: JSON.stringify({
-          asset: currency.toString().toUpperCase(),
-          amount: value,
-          currency_type: 'crypto',
-        }),
+        'Content-Type': 'multipart/form-data'
+        }
       });
-    const result = await response.json();
-    const res = result.result
-  
-    let url = res.pay_url
-    const id = res.invoice_id
-  
+    } catch (e) {
+      console.log(e);
     }
    
+    navigation('/actives');
   }
   return (
    <>
