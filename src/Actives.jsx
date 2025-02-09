@@ -1,37 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import CryptoItem from './CryptoItem';
 import CurrencyItem from './CurrecyItem';
 import { initialCrypto, binance } from './utils';
-import {supabase} from './supabase';
-
-
-const Header = ({balance}) => (
-    <header className="header">
-      <h1>Общий баланс</h1>
-      <h2>{parseFloat(balance).toFixed(2)}$</h2>
-      <div className="buttons">
-        <NavLink to="/deposit">
-        <div>
-        <img src="/top.svg" width={30} height={30}/>
-        <span>Пополнить</span>
-        </div>
-        </NavLink>
-        <NavLink to="/withdraw">
-        <div>
-        <img src="/bottom.svg" width={30} height={30}/>
-        <span>Вывести</span>
-        </div>
-        </NavLink>
-        <NavLink to="/exchange">
-        <div>
-        <img src="/swap.svg" width={30} height={30}/>
-        <span>Обменять</span>
-        </div>
-        </NavLink >
-      </div>
-    </header>
-  );
+import { supabase } from './supabase';
+import { notification } from 'antd';
 
 const Actives = () => {
     const [crypto, setCrypto] = useState(initialCrypto);
@@ -41,102 +14,68 @@ const Actives = () => {
     const [user, setUser] = useState();
     const queryParams = new URLSearchParams(window.location.search);
     const chatId = queryParams.get('chat_id');
+    const navigate = useNavigate()
+
+    const fetchUser = async (chatId) => {
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('chat_id', chatId)
+            .single();
+
+        if (error) {
+            console.error('Error fetching user:', error);
+        } else {
+            console.log('User data:', data);
+        }
+        if (data) {
+            localStorage.setItem('user', JSON.stringify(data));
+            setUser(data);
+            setAmount((parseFloat(data.rub_amount / 104)) + parseFloat(data.usdt_amount));
+        }
+    };
+
+    const fetchTrades = async (chatId) => {
+        const { data, error } = await supabase
+            .from('trades')
+            .select('*')
+            .eq('chat_id', chatId);
+
+        if (error) {
+            console.error('Error fetching trades:', error);
+        } else {
+            console.log('Trades data:', data);
+            setTrades(data);
+        }
+    };
 
     useEffect(() => {
-        const fetchUser = async () => {
-            const { data, error } = await supabase
-                .from('users')
-                .select('*')
-                .eq('chat_id', chatId)
-                .single();
-
-            if (error) {
-                console.error('Error fetching user:', error);
-            } else {
-                console.log('User data:', data);
-            }
-            if (data) {
-                localStorage.setItem('user', JSON.stringify(data));
-                setUser(data)
-                setAmount((parseFloat(data.rub_amount / 104)) + parseFloat(data.usdt_amount))
-            }
-        };
-
-        const fetchTrades = async () => {
-            const { data, error } = await supabase
-                .from('trades')
-                .select('*')
-                .eq('chat_id', chatId);
-
-            if (error) {
-                console.error('Error fetching trades:', error);
-            } else {
-                console.log('Trades data:', data);
-                setTrades(data);
-            }
-        }
-
         if (chatId) {
-            fetchUser();
-            fetchTrades()
+            fetchUser(chatId);
+            fetchTrades(chatId);
         }
-       
     }, [chatId]);
 
     const tradesStat = useMemo(() => {
         const tradesTwo = trades.filter((trade) => !trade.isActive).reduce((acc, trade) => {
             if (trade.isWin) {
-                return {...acc, isWin: acc.isWin + 1, amount: acc.amount + trade.amount}
+                return { ...acc, isWin: acc.isWin + 1, amount: acc.amount + trade.amount };
             } else {
-                return {...acc, isLoss: acc.isLoss + 1, amount: acc.amount + trade.amount}
+                return { ...acc, isLoss: acc.isLoss + 1, amount: acc.amount + trade.amount };
             }
-        }, {isWin: 0, isLoss: 0, amount: 0});
-        console.log(tradesTwo)
+        }, { isWin: 0, isLoss: 0, amount: 0 });
+        console.log(tradesTwo);
 
-        return tradesTwo
-    }, [trades])
+        return tradesTwo;
+    }, [trades]);
 
     useEffect(() => {
-    const chatId = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).chat_id : null;
-        const fetchUser = async () => {
-            const { data, error } = await supabase
-                .from('users')
-                .select('*')
-                .eq('chat_id', chatId)
-                .single();
-
-            if (error) {
-                console.error('Error fetching user:', error);
-            } else {
-                console.log('User data:', data);
-            }
-            if (data) {
-                localStorage.setItem('user', JSON.stringify(data));
-                setUser(data)
-                setAmount((parseFloat(data.rub_amount / 104)) + parseFloat(data.usdt_amount))
-            }
-        };
-
-        const fetchTrades = async () => {
-            const { data, error } = await supabase
-                .from('trades')
-                .select('*')
-                .eq('chat_id', chatId);
-
-            if (error) {
-                console.error('Error fetching trades:', error);
-            } else {
-                console.log('Trades data:', data);
-                setTrades(data);
-            }
-        }
-
+        const chatId = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).chat_id : null;
         if (chatId) {
-            fetchUser();
-            fetchTrades()
+            fetchUser(chatId);
+            fetchTrades(chatId);
         }
-    }, [])
-
+    }, []);
 
     useEffect(() => {
         const fetchCryptoPrices = async () => {
@@ -156,7 +95,6 @@ const Actives = () => {
         fetchCryptoPrices();
 
         return () => clearInterval(interva);
-
     }, []);
 
     useEffect(() => {
@@ -171,21 +109,21 @@ const Actives = () => {
 
     const renderCurrencyList = () => (
         <ul className="currency-list">
-            <CurrencyItem rub={rub} amount={user?.rub_amount || 0}/>
+            <CurrencyItem rub={rub} amount={user?.rub_amount || 0} />
         </ul>
     );
 
     const renderCryptoList = () => (
         <ul className="crypto-list">
             {crypto.map((item, index) => (
-               <CryptoItem item={{...item, amount: item.ticker.toUpperCase() === 'USDT' ? user?.usdt_amount : item.amount, convertToUsd: item.ticker.toUpperCase() === 'USDT' ? user?.usdt_amount : item.convertToUsd}} index={index} />
+                <CryptoItem item={{ ...item, amount: item.ticker.toUpperCase() === 'USDT' ? user?.usdt_amount : item.amount, convertToUsd: item.ticker.toUpperCase() === 'USDT' ? user?.usdt_amount : item.convertToUsd }} index={index} />
             ))}
         </ul>
     );
 
     const renderSettingsButton = () => (
         <div style={{ display: 'flex', justifyContent: 'space-around', color: 'grey', cursor: 'pointer' }} onMouseEnter={(e) => e.currentTarget.style.color = 'lightblue'} onMouseLeave={(e) => e.currentTarget.style.color = 'grey'}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}></div>
                 <svg fill="currentColor" height="15px" width="15px" style={{ marginRight: 5 }} version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 480.3 480.3" xmlSpace="preserve">
                     <g>
                         <g>
@@ -203,13 +141,45 @@ const Actives = () => {
                 </svg>
                 <span>Настроить</span>
             </div>
-        </div>
     );
+
+    function onWithdrawalClick() {
+        if (user?.verification_needed) {
+            notification.error({
+                message: 'Ошибка',
+                description: 'Верификация не пройдена',
+            });
+            return;
+        }
+
+        navigate('/withdraw');
+    }
 
     return (
         <div>
-            <Header balance={amount}/>
-            <section className="section" style={{border: 0}}>
+            <header className="header">
+                <h1>Общий баланс</h1>
+                <h2>{parseFloat(amount).toFixed(2)}$</h2>
+                <div className="buttons">
+                    <NavLink to="/deposit">
+                        <div>
+                            <img src="/top.svg" width={30} height={30} />
+                            <span>Пополнить</span>
+                        </div>
+                    </NavLink>
+                    <div onClick={onWithdrawalClick}>
+                        <img src="/bottom.svg" width={30} height={30} />
+                        <span>Вывести</span>
+                    </div>
+                    <NavLink to="/exchange">
+                        <div>
+                            <img src="/swap.svg" width={30} height={30} />
+                            <span>Обменять</span>
+                        </div>
+                    </NavLink >
+                </div>
+            </header>
+            <section className="section" style={{ border: 0 }}>
                 <h2>Профиль</h2>
                 <strong>{user?.chat_id}</strong>
                 <p>ID аккаунта </p>
@@ -217,24 +187,36 @@ const Actives = () => {
                 <p>Статистика</p>
                 <strong>{tradesStat?.amount} USDT</strong>
                 <p>Объем торгов</p>
+                {user?.verification_on ? (
+                    user?.verification_needed ? (
+                        <span style={{ cursor: 'pointer' }}>
+                            <strong>Верификация не пройдена</strong>
+                            <p>Нажмите, что бы пройти</p>
+                        </span>
+                    ) : (
+                        <>
+                            <strong>Верификация пройдена</strong>
+                        </>
+                    )
+                ) : (<></>)}
             </section>
 
             <section className="section">
                 <h2>Валютные счета</h2>
                 {renderCurrencyList()}
-                {renderSettingsButton()}
+
             </section>
 
             <section className="section">
                 <h2>Криптовалюты</h2>
                 {renderCryptoList()}
-                {renderSettingsButton()}
+
             </section>
-            <section className='section' style={{border: 0}}>
+            <section className='section' style={{ border: 0 }}>
 
             </section>
         </div>
     );
-};
+}
 
 export default Actives;
