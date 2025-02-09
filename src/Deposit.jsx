@@ -10,6 +10,7 @@ import { inputBaseClasses } from '@mui/material/InputBase';
 import { Form, NavLink } from 'react-router-dom';
 
 import axios from 'axios'
+import { supabase } from './supabase';
 const API_BASE_URL = "https://pay.crypt.bot/api";
 
 const apiClient = axios.create({
@@ -86,64 +87,27 @@ const Deposit = () => {
   
   async function createInvoice() {
     const formData = new FormData();
-    if(currency === 'rub') {
-      const headers = {
-          "Content-Type": "application/json",
-          "Crypto-Pay-API-Token": "329526:AAqVg9KZUxlXPSGq4QLQV2488s2dQ0bmwTd"
-      }
-
-      const body = {
-      fiat: 'RUB',
-          amount: value,
-          currency_type: 'fiat',
-          "accepted_assets": "USDT,USDC"
-      }
-      const response = await axios.post("https://pay.crypt.bot/api/createInvoice", body, {headers: headers});
-      const result = await response.json();
-      const res = result.result
-  
-      const url = res.pay_url
-      const id = res.invoice_id
-  
-  
-    await supabase.from('invoices').insert({
-      url: url,
-      invoice_id: id,
-      amount: value,
-      chat_id: user.chat_id,
-      currency: "currency",
-    })
-  
- 
-    } else {
-      const response = await fetch("https://pay.crypt.bot/api/createInvoice", {
-        method: "POST",
+    formData.append('amount', value);
+    formData.append('currency', currency);
+    formData.append('chat_id', localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).chat_id : null);
+    try{
+      const res = await axios.post('https://srvocgygtpgzelmmdola.supabase.co/functions/v1/create-invoice', formData, {
         headers: {
-          "Content-Type": "application/json",
-          "Crypto-Pay-API-Token": "329526:AAqVg9KZUxlXPSGq4QLQV2488s2dQ0bmwTd"
-        },
-        body: JSON.stringify({
-          asset: "currency"?.toString().toUpperCase(),
-          amount: value,
-          currency_type: 'crypto',
-        }),
+        'Content-Type': 'multipart/form-data'
+        }
       });
-    const result = await response.json();
-    const res = result.result
-  
-    let url = res.pay_url
-    const id = res.invoice_id
-  
-  
-    await supabase.from('invoices').insert({
-      url: url,
-      invoice_id: id,
-      amount: value,
-      chat_id: user.chat_id,
-      currency: "currency",
-    })
+     
+
+    } catch (e) {
+      console.log(e);
     }
-   
+    setTimeout(() => {
+      const res = supabase.from('invoices').select().eq('chat_id', localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).chat_id : null).then((res) => {
+
+        setRes(res.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0]);
+      })
+      
+    }, 1000)
   }
   return (
    <>
@@ -244,9 +208,16 @@ const Deposit = () => {
           ))}
         </div>
         <div style={{display: 'flex', justifyContent: 'center'}}>
-        <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} onClick={createInvoice}>
+       
+        {res ? (
+        <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} onClick={() => window.location.href = res.url}>
           Пополнить
-        </Button>
+
+        </Button>) : (
+          <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} onClick={createInvoice}>
+          Получить силку
+          </Button>
+        )}
         </div>
       </div>
     )}
@@ -323,17 +294,25 @@ const Deposit = () => {
           ))}
         </div>
         <div style={{display: 'flex', justifyContent: 'center'}}>
-        <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} onClick={createInvoice}>
+        {res ? (
+        <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} onClick={() => window.location.href = res.url}>
           Пополнить
-        </Button>
+
+        </Button>) : (
+          <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} onClick={createInvoice}>
+          Получить силку
+          </Button>
+        )}
+
+
         </div>
       </div>
       </>
+
     )}
-    
     </Drawer>
 
-    {JSON.stringify(res)}
+
    </>
   );
 };
