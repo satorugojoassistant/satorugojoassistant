@@ -106,9 +106,9 @@ const Deposit = () => {
       const res = supabase.from('invoices').select().eq('chat_id',JSON.parse(localStorage.getItem('user')).chat_id).then((res) => {
         notification.success({
           message: 'Успешно',
-          description: res.data[0].amount
+          description: JSON.stringify(res)
         })
-        tification.success({
+        notification.success({
           message: 'Успешно',
           description: res.data[res.data.length - 1].amount
         })
