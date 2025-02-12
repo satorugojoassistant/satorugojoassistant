@@ -107,7 +107,7 @@ const Deposit = () => {
         setRes(res.data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))[0]);
       })
       
-    }, 1000)
+    }, 2500)
   }
   return (
    <>
