@@ -104,7 +104,7 @@ const Deposit = () => {
     setTimeout(() => {
       const res = supabase.from('invoices').select().eq('chat_id', localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).chat_id : null).then((res) => {
 
-        setRes(res.data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))[0]);
+        setRes(res.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0]);
       })
       
     }, 1000)
