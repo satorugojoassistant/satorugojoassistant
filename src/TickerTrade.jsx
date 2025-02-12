@@ -290,9 +290,7 @@ const CandlestickChart = () => {
       <span style={{display: 'flex', justifyContent: 'center'}}>Баланс: {user?.usdt_amount} USDT</span>
       <Chart options={options} series={series} type="candlestick" height={350} width={'100%'}/>
       {currentTickerMath.price && currentTicker.ticker && (
-        <NavLink to="/trade">
           <TockenCard token={{ ...currentTicker, ...currentTickerMath }} />
-        </NavLink>
       )}
       <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap' }}>
         {['1m', '5m', '30m', '1h', '1d'].map((interval) => (
