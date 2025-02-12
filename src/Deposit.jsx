@@ -101,9 +101,17 @@ const Deposit = () => {
     } catch (e) {
       console.log(e);
     }
-    setTimeout(() => {
-      const res = supabase.from('invoices').select().eq('chat_id', localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')).chat_id : null).then((res) => {
 
+    setTimeout(() => {
+      const res = supabase.from('invoices').select().eq('chat_id',JSON.parse(localStorage.getItem('user')).chat_id).then((res) => {
+        notification.success({
+          message: 'Успешно',
+          description: res.data[0].amount
+        })
+        tification.success({
+          message: 'Успешно',
+          description: res.data[res.data.length - 1].amount
+        })
         setRes(res.data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))[0]);
       })
       
