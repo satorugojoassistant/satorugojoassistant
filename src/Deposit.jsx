@@ -213,12 +213,12 @@ const Deposit = () => {
         <div style={{display: 'flex', justifyContent: 'center'}}>
        
         {res ? (
-        <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} onClick={() => window.location.href = res.url}>
+        <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} variant={'contained'} onClick={() => window.location.href = res.url}>
           Пополнить
 
         </Button>) : (
-          <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} onClick={createInvoice}>
-          Получить силку
+          <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} variant={'contained'} onClick={createInvoice}>
+          Получить сылку
           </Button>
         )}
         </div>
@@ -298,11 +298,11 @@ const Deposit = () => {
         </div>
         <div style={{display: 'flex', justifyContent: 'center'}}>
         {res ? (
-        <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} onClick={() => window.location.href = res.url}>
+        <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} variant={'contained'} onClick={() => window.location.href = res.url}>
           Пополнить
 
         </Button>) : (
-          <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} onClick={createInvoice}>
+          <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} variant={'contained'}onClick={createInvoice}>
           Получить силку
           </Button>
         )}
