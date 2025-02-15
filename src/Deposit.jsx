@@ -218,7 +218,7 @@ const Deposit = () => {
 
         </Button>) : (
           <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} variant={'contained'} onClick={createInvoice}>
-          Получить сылку
+          Получить cсылку
           </Button>
         )}
         </div>
@@ -303,7 +303,7 @@ const Deposit = () => {
 
         </Button>) : (
           <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} variant={'contained'}onClick={createInvoice}>
-          Получить силку
+          Получить cсылку
           </Button>
         )}
 
