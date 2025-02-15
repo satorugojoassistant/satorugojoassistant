@@ -10,7 +10,7 @@ const CurrencyItem = ({rub, amount}) => {
                 <p style={{ margin: '5px 0' }} className='crypto-list-price'>{rub} ₽</p>
             </div>
         </div>
-        {amount} ₽
+        {parseFloat(amount).toFixed(2)} ₽
     </li>
   );
 };
