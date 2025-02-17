@@ -7,10 +7,10 @@ const CurrencyItem = ({rub, amount}) => {
             <img src={'/rub.jpeg'} alt={'Rub'} width={30} height={30} style={{ borderRadius: '50%' }} />
             <div>
                 <p style={{ margin: '5px 0' }}>Российский рубль</p>
-                <p style={{ margin: '5px 0' }} className='crypto-list-price'>{rub} ₽</p>
+                <p style={{ margin: '5px 0' }} className='crypto-list-price'>{rub || 0} ₽</p>
             </div>
         </div>
-        {parseFloat(amount).toFixed(2)} ₽
+        {parseFloat( amount || '0').toFixed(2)} ₽
     </li>
   );
 };
