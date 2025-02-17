@@ -61,7 +61,7 @@ const Exchange = () => {
       user.rub_amount = newRubAmount;
       user.usdt_amount = parseFloat(newUsdtAmount);
         } else {
-      const newUsdtAmount = parseFloat(user.usdt_amount) - amount;
+      const newUsdtAmount = parseFloat((parseFloat(user.usdt_amount) - amount)).toFixed(2);
       const newRubAmount = (parseFloat(user.rub_amount) + (amount * rub)).toFixed(2);
 
       if (newUsdtAmount < 0) {
