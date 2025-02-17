@@ -395,7 +395,7 @@ const CandlestickChart = () => {
           <ButtonGroup
           sx={{display: 'flex', justifyContent: 'space-around', gap: '5px', flexWrap: 'wrap'}}
           labelId="demo-simple-select-label">
-            {['30s', '1m', '5m', '15m', '30m', '1h'].map((time) => (
+            {['20s','30s', '1m', '5m', '15m', '30m', '1h'].map((time) => (
               <Button
                 key={time}
                 value={time}
