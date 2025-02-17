@@ -38,7 +38,7 @@ const CandlestickChart = () => {
   const [series, setSeries] = useState([]);
   const [amount, setAmount] = useState(0);
   const [time, setTime] = useState('1m');
-  const [timeToFinish, setTimeToFinish] = useState('30s');
+  const [timeToFinish, setTimeToFinish] = useState('20s');
   const [currentTicker, setCurrentTicker] = useState({});
   const [trade,setTrade] = useState();
   const [user,setUser] = useState();
