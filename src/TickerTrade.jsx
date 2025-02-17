@@ -73,16 +73,23 @@ const CandlestickChart = () => {
     const storedUser = localStorage.getItem('user');
     
     if (storedUser) {
-      fetchUser()
+      const inverval = setInterval(() => {
+        fetchUser()
+      }, 5000)
+      return () => clearInterval(inverval)      
     }
   }, [])
 
   useEffect(() => {
+    let interval
     if (user) {
       
-
-      fetchUserTrades(user);
+      interval = setInterval(() => {
+        fetchUserTrades(user);  
+      }, 5000)
     }
+
+    return () => clearInterval(interval);
   }, [user])
 
   const fetchUserTrades = async (user) => {
