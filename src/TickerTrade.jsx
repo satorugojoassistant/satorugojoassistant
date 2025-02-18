@@ -75,7 +75,7 @@ const CandlestickChart = () => {
     if (storedUser) {
       const inverval = setInterval(() => {
         fetchUser()
-      }, 5000)
+      }, 10000)
       return () => clearInterval(inverval)      
     }
   }, [])
