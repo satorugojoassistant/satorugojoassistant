@@ -101,14 +101,11 @@ const Deposit = () => {
     } catch (e) {
       console.log(e);
     }
-
-    setTimeout(() => {
-      const res = supabase.from('invoices').select().eq('chat_id',JSON.parse(localStorage.getItem('user')).chat_id).then((res) => {
-
-        setRes(res.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0]);
-      })
-      
-    }, 2500)
+    navigation('/actives')
+    notification.success({
+      message: 'Успешно',
+      description: 'Зайдите в телеграм бот и оплатите счет',
+    })
   }
   return (
    <>
@@ -210,15 +207,10 @@ const Deposit = () => {
         </div>
         <div style={{display: 'flex', justifyContent: 'center'}}>
        
-        {res ? (
-        <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} variant={'contained'} onClick={() => window.location.href = res.url}>
+        <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} variant={'contained'} onClick={createInvoice}>
           Пополнить
 
-        </Button>) : (
-          <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} variant={'contained'} onClick={createInvoice}>
-          Получить cсылку
-          </Button>
-        )}
+        </Button>
         </div>
       </div>
     )}
@@ -295,17 +287,9 @@ const Deposit = () => {
           ))}
         </div>
         <div style={{display: 'flex', justifyContent: 'center'}}>
-        {res ? (
-        <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} variant={'contained'} onClick={() => window.location.href = res.url}>
+        <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} variant={'contained'} onClick={createInvoice}>
           Пополнить
-
-        </Button>) : (
-          <Button sx={{width: '150px', border: '1px solid #0056b3', margin: '15px'}} variant={'contained'}onClick={createInvoice}>
-          Получить cсылку
-          </Button>
-        )}
-
-
+        </Button>
         </div>
       </div>
       </>
