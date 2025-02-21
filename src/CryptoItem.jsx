@@ -11,7 +11,7 @@ const CryptoItem = ({ item, index }) => {
         </div>
       </div>
       <div>
-        <p style={{ margin: '5px 0', textAlign: 'end', fontWeight: 700 }}>{item.amount}</p>
+        <p style={{ margin: '5px 0', textAlign: 'end', fontWeight: 700 }}>{parseFloat(String(item.amount)).toFixed(2)}</p>
         <h1 style={{ margin: '5px 0' }}>{item.convertToUsd} $</h1>
       </div>
     </li>
