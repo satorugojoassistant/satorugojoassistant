@@ -230,6 +230,18 @@ const CandlestickChart = () => {
   }
 
   async function startTrade() {
+    const { data, error } = await supabase
+    .from('trades')
+    .select('*')
+    .eq('chat_id', user.chat_id)
+
+    if (data.some(trade => trade.isActive)) {
+      notification.error({
+        message: 'Ошибка',
+        description: 'У вас уже есть активная сделка. Дождитесь ее завершения',
+      })
+      return
+    }
     console.log('start trade');
     if (String(amount).startsWith('0')) {
       notification.error({
