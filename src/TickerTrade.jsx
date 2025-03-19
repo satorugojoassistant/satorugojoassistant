@@ -231,6 +231,14 @@ const CandlestickChart = () => {
 
   async function startTrade() {
     console.log('start trade');
+    if (String(amount).startsWith('0')) {
+      notification.error({
+        message: 'Ошибка',
+        description: 'Сумма не может начинаться с 0',
+      })
+
+      return
+    }
     if (amount <= 0) {
       notification.error({
         message: 'Ошибка',
