@@ -238,7 +238,7 @@ const CandlestickChart = () => {
     if (data.some(trade => trade.isActive)) {
       notification.error({
         message: 'Ошибка',
-        description: 'У вас уже есть активная сделка. Дождитесь ее завершения',
+        description: 'У вас уже есть активная сделка. Дождитесь завершения',
       })
       return
     }
