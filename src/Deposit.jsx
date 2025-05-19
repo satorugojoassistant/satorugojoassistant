@@ -58,7 +58,7 @@ const Deposit = () => {
       const fetchRubPrice = async () => {
           const response = await fetch(binance + 'USDTRUB');
           const data = await response.json();
-          setRub((Number(data.price) + 13).toFixed(2));
+          setRub((Number(data.price) - 3).toFixed(2));
       };
 
       fetchRubPrice();
